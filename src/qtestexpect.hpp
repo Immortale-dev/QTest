@@ -8,8 +8,7 @@ class QTestExpect
 		
 		QTestExpect(T a, bool& result) : val(a), result(result) {};
 		
-		template<typename CT>
-		void toBe(CT compare);
+		void toBe(T compare);
 		
 	private:
 		T val;
@@ -18,11 +17,12 @@ class QTestExpect
 
 
 template<typename T>
-template<typename CT>
-void QTestExpect<T>::toBe(CT compare)
+void QTestExpect<T>::toBe(T compare)
 {
 	result &= (val == compare);
 }
+
+
 
 
 #endif // QTESTEXPECT_H

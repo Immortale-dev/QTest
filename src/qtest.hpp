@@ -26,10 +26,15 @@ namespace{
  * 
  * 
  * DESCRIBE("...",{
+ * 
+ *     VAR a = ...
+ * 
  *     BEFOREALL({ ... });
  *     BEFOREEACH({ ... });
  * 
  *     DESCRIBE("...", {
+ * 
+ *         VAR b = ...
  * 
  *         BEFOREALL({ ... });
  *         BEFOREEACH({ ... });
@@ -37,7 +42,7 @@ namespace{
  *         IT("...", { 
  *         
  *             ...
- *             EXPECT(expression).[...] /// EQUALS | GREATERTHAN | LOWERTHATN | GREATEREQUALS | LOWEREUQUALS | ... see https://jasmine.github.io/api/3.4/matchers.html
+ *             EXPECT(expression).[...] /// toBe | ... 
  * 
  *         });
  * 
