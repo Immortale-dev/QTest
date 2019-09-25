@@ -1,8 +1,16 @@
 #ifndef QTESTPRINT_H
 #define QTESTPRINT_H
 
-#include <iostream>
+#ifdef _WIN32
+// For windows
 #include <windows.h>
+#else
+// For unix
+#include <sys/ioctl.h>
+#include <unistd.h>
+#endif
+
+#include <iostream>
 #include <string>
 #include <algorithm>
 
@@ -37,6 +45,8 @@ class QTestPrint
 		DWORD def_bgcolor, def_color;
 		int line_length = 60;
 		
+		enum class Color{Success, Error, Neutral, Grey, Default};
+		
 		const string newline = "\n";
 		const string tab = "    ";
 		const string delim_txt = "*";
@@ -57,6 +67,7 @@ class QTestPrint
 		void set_color_success();
 		void set_color_neutral();
 		void set_color_grey();
+		void set_color(Color c);
 };
 
 
@@ -229,39 +240,91 @@ std::string QTestPrint::toupper(string txt)
 
 void QTestPrint::processConsoleWindow()
 {
-	hConsole = GetStdHandle (STD_OUTPUT_HANDLE);
-	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	GetConsoleScreenBufferInfo(hConsole, &csbi);
-	
-    line_length = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    
-	def_color = (csbi.wAttributes%16);
-	def_bgcolor = ((csbi.wAttributes-def_color)%128);
+	#ifdef _WIN32
+		hConsole = GetStdHandle (STD_OUTPUT_HANDLE);
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
+		GetConsoleScreenBufferInfo(hConsole, &csbi);
+		line_length = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+		def_color = (csbi.wAttributes%16);
+		def_bgcolor = ((csbi.wAttributes-def_color)%128);
+	#else
+		struct winsize wn;
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &wn);
+		line_length = wn.ws_col;
+    #endif
 }
 
 void QTestPrint::set_color_default()
 {
-	SetConsoleTextAttribute(hConsole, def_color | def_bgcolor);
+	set_color(Color::Default);
+	//SetConsoleTextAttribute(hConsole, def_color | def_bgcolor);
 }
 
 void QTestPrint::set_color_error()
 {
-	SetConsoleTextAttribute(hConsole, FOREGROUND_RED | def_bgcolor);
+	set_color(Color::Error);
+	//SetConsoleTextAttribute(hConsole, FOREGROUND_RED | def_bgcolor);
 }
 
 void QTestPrint::set_color_success()
 {
-	SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN | def_bgcolor);
+	set_color(Color::Success);
+	//SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN | def_bgcolor);
 }
 
 void QTestPrint::set_color_neutral()
 {
-	SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY | def_bgcolor);
+	set_color(Color::Neutral);
+	//SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY | def_bgcolor);
 }
 
 void QTestPrint::set_color_grey()
 {
-	SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED | def_bgcolor);
+	set_color(Color::Grey);
+	//SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED | def_bgcolor);
+}
+
+void QTestPrint::set_color(Color c)
+{
+	#ifdef _WIN32
+		int color;
+		switch(c){
+			case Color::Success:
+				color = FOREGROUND_GREEN | def_bgcolor;
+				break;
+			case Color::Error:
+				color = FOREGROUND_RED | def_bgcolor;
+				break;
+			case Color::Neutral:
+				color = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY | def_bgcolor;
+				break;
+			case Color::Grey:
+				color = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED | def_bgcolor;
+				break;
+			default:
+				color = def_color | def_bgcolor;
+		}
+		SetConsoleTextAttribute(hConsole, color);
+	#else
+		string color;
+		switch(c){
+			case Color::Success:
+				color = "\e[32m";
+				break;
+			case Color::Error:
+				color = "\e[31m";
+				break;
+			case Color::Neutral:
+				color = "\e[96m";
+				break;
+			case Color::Grey:
+				color = "\e[37m";
+				break;
+			default:
+				color = "\e[39m";
+		}
+		print(color);
+	#endif
 }
 
 void QTestPrint::print_succeed_message()
