@@ -41,8 +41,10 @@ class QTestPrint
 		void print_failure_message();
 		
 	private:
+		#ifdef _WIN32
 		HANDLE hConsole;
 		DWORD def_bgcolor, def_color;
+		#endif
 		int line_length = 60;
 		
 		enum class Color{Success, Error, Neutral, Grey, Default};
@@ -55,7 +57,7 @@ class QTestPrint
 		const string skipped_txt = "skipped";
 		const string statistics_txt = "statistics";
 		const string testing_txt = "testing";
-		const string succ_sign = "[o]";
+		const string succ_sign = "[/]";
 		const string fail_sign = "[x]";
 		const string skip_sign = "[-]";
 		
@@ -286,6 +288,9 @@ void QTestPrint::set_color_grey()
 
 void QTestPrint::set_color(Color c)
 {
+	#ifdef TEST_RESULTS_NO_COLOR
+		return;
+	#endif
 	#ifdef _WIN32
 		int color;
 		switch(c){
