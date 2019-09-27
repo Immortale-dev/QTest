@@ -55,12 +55,12 @@ class QTestBase
 		QTestBase();
 		~QTestBase();
 		
-		void describe(const char* str, function_cb_t fnn, int param, const char* file);
+		void describe(string str, function_cb_t fnn, int param, const char* file);
 		void before(function_cb_t fn);
 		void before_each(function_cb_t fn);
 		void after(function_cb_t fn);
 		void after_each(function_cb_t fn);
-		void it(const char* str, function_cb_t fn, int param);
+		void it(string str, function_cb_t fn, int param);
 		void callback();
 		template<typename T>
 		QTestExpect<T> expect(T a);
@@ -144,7 +144,7 @@ void QTestBase::callback()
 	}
 }
 
-void QTestBase::describe(const char* str, function_cb_t fnn, int param, const char* file)
+void QTestBase::describe(string str, function_cb_t fnn, int param, const char* file)
 {
 	node* new_node = new node();
 	
@@ -187,7 +187,7 @@ void QTestBase::after_each(function_cb_t fn)
 	current->after_each.push_back(new func(fn));
 }
 
-void QTestBase::it(const char* str, function_cb_t fn, int param)
+void QTestBase::it(string str, function_cb_t fn, int param)
 {
 	test* t = new test(str, fn);
 	t->only = param == QTEST_ONLY_PARAM_ID;

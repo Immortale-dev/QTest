@@ -28,7 +28,7 @@ namespace{
 	using function_cb_t = std::function<void()>;
 	struct QTestDescribe_t
 	{
-		QTestDescribe_t(const char* str, function_cb_t fn, int param, const char* file){ QTESTOBJECTDEFINED.describe(str, fn, param, file); };
+		QTestDescribe_t(std::string str, function_cb_t fn, int param, const char* file){ QTESTOBJECTDEFINED.describe(str, fn, param, file); };
 	};
 }
 

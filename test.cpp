@@ -286,6 +286,18 @@ DESCRIBE_ONLY("[Test]", {
 		});
 	});
 	
+	
+	/*
+	for(int ii=0;ii<10;ii++){
+		std::cout <<"WHAT THE FUCK??" << std::endl;
+		string temp = "cycle test " + to_string(ii);
+		DESCRIBE(temp, {
+			IT("should be succeed", {
+				TEST_SUCCEED();
+			});
+		});
+	} */
+	
 	DESCRIBE("Delayed tests", {
 		IT("should be delayed 1 sec", {
 			sleep(1);
@@ -300,8 +312,6 @@ DESCRIBE_ONLY("[Test]", {
 			TEST_SUCCEED();
 		});
 	});
-	
-	
 });
 
 DESCRIBE("This one is another describe that beside to DESCRIBE_ONLY rule", {
