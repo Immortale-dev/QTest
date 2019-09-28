@@ -28,6 +28,22 @@ class QTestExpect
 		void toReturnTrue();
 		QTestExpect<T> NOT();
 		
+		//Aliases
+		void to_be(T compare){ return toBe(compare); };
+		void to_be_close_to( double compare, double precision){ return toBeCloseTo(compare, precision); };
+		void to_be_greater_than(T compare){ return toBeGreaterThan(compare); };
+		void to_be_greater_than_or_equal(T compare){ return toBeGreaterThanOrEqual(compare); };
+		void to_be_less_than(T compare){ return toBeLessThan(compare); };
+		void to_be_less_than_or_equal(T compare){ return toBeLessThanOrEqual(compare); };
+		void to_be_null(){ return toBeNull(); };
+		void to_be_null_ptr(){ return toBeNullPtr(); };
+		template<typename CT>
+		void to_be_iteratable_equal(CT compare){ return toBeIteratableEqual(compare); };
+		template<typename CT>
+		void to_be_iteratable_equal(std::initializer_list<CT> list){ return toBeIteratableEqual(list); };
+		void to_throw_error(){ return toThrowError(); };
+		void to_return_true(){ return toReturnTrue(); };
+		
 	private:
 		T val;
 		bool* result;

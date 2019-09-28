@@ -7,7 +7,6 @@
 
 using namespace std;
 
-
 DESCRIBE_ONLY("[Test]", {
 		
 	DESCRIBE("second level", {
@@ -286,18 +285,6 @@ DESCRIBE_ONLY("[Test]", {
 		});
 	});
 	
-	
-	/*
-	for(int ii=0;ii<10;ii++){
-		std::cout <<"WHAT THE FUCK??" << std::endl;
-		string temp = "cycle test " + to_string(ii);
-		DESCRIBE(temp, {
-			IT("should be succeed", {
-				TEST_SUCCEED();
-			});
-		});
-	} */
-	
 	DESCRIBE("Delayed tests", {
 		IT("should be delayed 1 sec", {
 			sleep(1);
@@ -312,7 +299,26 @@ DESCRIBE_ONLY("[Test]", {
 			TEST_SUCCEED();
 		});
 	});
-});
+	
+	DESCRIBE("Cycle describe", {
+		int ind = 0;
+		int bind = 0;
+		
+		BEFORE_EACH({
+			bind++;
+		});
+		
+		for(int i=0;i<10;i++){
+			DESCRIBE("D - "+to_string(i), {
+				ind++;
+				IT("`ind` should be euqal "+to_string(bind), {
+					EXPECT(ind).toBe(bind);
+				});
+			});
+		}
+	});
+}); 
+
 
 DESCRIBE("This one is another describe that beside to DESCRIBE_ONLY rule", {
 	
