@@ -21,9 +21,9 @@ class QTestExpect
 		void toBeNull();
 		void toBeNullPtr();
 		template<typename CT>
-		void toBeIteratableEqual(CT compare);
+		void toBeIterableEqual(CT compare);
 		template<typename CT>
-		void toBeIteratableEqual(std::initializer_list<CT> list);
+		void toBeIterableEqual(std::initializer_list<CT> list);
 		void toThrowError();
 		void toReturnTrue();
 		QTestExpect<T> NOT();
@@ -38,9 +38,9 @@ class QTestExpect
 		void to_be_null(){ return toBeNull(); };
 		void to_be_null_ptr(){ return toBeNullPtr(); };
 		template<typename CT>
-		void to_be_iteratable_equal(CT compare){ return toBeIteratableEqual(compare); };
+		void to_be_iteratble_equal(CT compare){ return toBeIteratableEqual(compare); };
 		template<typename CT>
-		void to_be_iteratable_equal(std::initializer_list<CT> list){ return toBeIteratableEqual(list); };
+		void to_be_iterable_equal(std::initializer_list<CT> list){ return toBeIteratableEqual(list); };
 		void to_throw_error(){ return toThrowError(); };
 		void to_return_true(){ return toReturnTrue(); };
 		

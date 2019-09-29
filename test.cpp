@@ -219,7 +219,7 @@ DESCRIBE_ONLY("[Test]", {
 		});
 	});
 	
-	DESCRIBE("toBeIteratableEqual expect method", {
+	DESCRIBE("toBeIterableEqual expect method", {
 		auto vec = vector<int>();
 		
 		BEFORE_ALL({
@@ -227,16 +227,16 @@ DESCRIBE_ONLY("[Test]", {
 				vec.push_back(i);
 		});
 		
-		IT("vec should toBeIteratableEqual to {5,6,7,8,9}", {
-			EXPECT(vec).toBeIteratableEqual({5,6,7,8,9});
+		IT("vec should toBeIterableEqual to {5,6,7,8,9}", {
+			EXPECT(vec).toBeIterableEqual({5,6,7,8,9});
 		});
 		
-		IT("vec should toBeIteratableEqual to list<int>{5,6,7,8,9}", {
+		IT("vec should toBeIterableEqual to list<int>{5,6,7,8,9}", {
 			list<int> comp;
 			for(int i=5;i<10;i++)
 				comp.push_back(i);
 			
-			EXPECT(vec).toBeIteratableEqual(comp);
+			EXPECT(vec).toBeIterableEqual(comp);
 		});
 	});
 	
