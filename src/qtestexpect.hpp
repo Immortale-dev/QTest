@@ -1,10 +1,8 @@
 #ifndef QTESTEXPECT_H
 #define QTESTEXPECT_H
 
-#include <iostream>
-#include <functional>
-#include <cmath>
 #include <vector>
+#include <cmath>
 #include <initializer_list>
 
 template<typename T>

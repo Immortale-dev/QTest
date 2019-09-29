@@ -5,7 +5,6 @@
 #include <functional>
 #include <vector>
 #include <string>
-#include <queue>
 #include <algorithm>
 #include "qtestexpect.hpp"
 #include "qtestprint.hpp"

@@ -259,31 +259,26 @@ void QTestPrint::processConsoleWindow()
 void QTestPrint::set_color_default()
 {
 	set_color(Color::Default);
-	//SetConsoleTextAttribute(hConsole, def_color | def_bgcolor);
 }
 
 void QTestPrint::set_color_error()
 {
 	set_color(Color::Error);
-	//SetConsoleTextAttribute(hConsole, FOREGROUND_RED | def_bgcolor);
 }
 
 void QTestPrint::set_color_success()
 {
 	set_color(Color::Success);
-	//SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN | def_bgcolor);
 }
 
 void QTestPrint::set_color_neutral()
 {
 	set_color(Color::Neutral);
-	//SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY | def_bgcolor);
 }
 
 void QTestPrint::set_color_grey()
 {
 	set_color(Color::Grey);
-	//SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED | def_bgcolor);
 }
 
 void QTestPrint::set_color(Color c)
