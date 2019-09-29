@@ -1,6 +1,8 @@
 #include <iostream>
 #include <unistd.h>
 #include <list>
+#include <set>
+#include <unordered_set>
 
 #define TEST_ONLY_RULE
 #include "qtest.hpp"
@@ -9,8 +11,7 @@ using namespace std;
 
 DESCRIBE_ONLY("[Test]", {
 		
-	DESCRIBE("second level", {
-
+	DESCRIBE("Second level", {
 		IT("should succeed as TEST_SUCCEED method used", {
 			TEST_SUCCEED();
 		});
@@ -20,13 +21,11 @@ DESCRIBE_ONLY("[Test]", {
 		});
 	});
 	
-	DESCRIBE("Static variables", {
-		
+	DESCRIBE("Variables", {
 		DESCRIBE("Int type variable", {
 			int inc = 2;
 			
 			DESCRIBE("With before_each increment function", {
-				
 				int inc = 0;
 				
 				BEFORE_EACH({
@@ -38,60 +37,59 @@ DESCRIBE_ONLY("[Test]", {
 				});
 				
 				IT("Second test - inc variable should be equals to 2", {
-				
 					EXPECT(inc).toBe(2);
-					
 				});
 				
 				IT("Third test - inc variable should be equals to 3", {
-				
 					EXPECT(inc).toBe(3);
-					
 				});
-				
 			});
 			
-			DESCRIBE("To check static variables scope", {
-				
-				IT("inc variable should be equals to 2", {
+			DESCRIBE("Sum of variables", {
+				int a,b,c;
+				BEFORE_EACH({
+					a = 1;
+					b = 2;
+					c = 3;
+				});
+				DESCRIBE("Ariphmetic Operations", {
+					IT("sum of `a` and `b` should be equal to `c`", {
+						EXPECT(a+b).toBe(c);
+					});
+				});
+			});
+			
+			DESCRIBE("And check variables scope", {
+				IT("inc variable should be equals to 2 here", {
 					EXPECT(inc).toBe(2);
 				});
-				
 			});
 		});
 		
 		DESCRIBE("vector<int> type varialbe first section", {
-			
 			static vector<int> vec;
 			
 			BEFORE_ALL({
-				
 				for(int i=0;i<10;i++)
 					vec.push_back(i);
-				
 			});
 			
 			IT("Vector should contains 10 items", {
 				EXPECT((int)vec.size()).toBe(10);
 			});
-			
 		});
 		
 		DESCRIBE("vector<int> type variable second section", {
-			
 			vector<int> vec;
 			
 			BEFORE_ALL({
-				
 				for(int i=0;i<8;i++)
 					vec.push_back(i);
-				
 			});
 			
 			IT("Vector should contains 8 items", {
 				EXPECT((int)vec.size()).toBe(8);
 			});
-			
 		});
 		
 		DESCRIBE("int variable that will be shared", {
@@ -118,17 +116,14 @@ DESCRIBE_ONLY("[Test]", {
 		});
 		
 		DESCRIBE("auto type variables", {
-			
 			auto vec = vector<int>();
-			
+
 			for(int i=0;i<100;i++)
 				vec.push_back(i);
-				
 				
 			IT("vec variable should contain 100 elements", {
 				EXPECT((int)vec.size()).toBe(100);
 			});
-			
 		});
 		
 		DESCRIBE("auto pointer type variables", {
@@ -151,7 +146,7 @@ DESCRIBE_ONLY("[Test]", {
 		
 	});
 	
-	DESCRIBE("Dynamic duration variables", {
+	DESCRIBE("Dynamic time duration variables", {
 		int* a = new int(0);
 		
 		DESCRIBE("with before_each increment function", {
@@ -165,6 +160,10 @@ DESCRIBE_ONLY("[Test]", {
 			
 			IT("a variable should be equal to 2", {
 				EXPECT(*a).toBe(2);
+			});
+			
+			AFTER_ALL({
+				delete a;
 			});
 		});
 	});
@@ -285,21 +284,6 @@ DESCRIBE_ONLY("[Test]", {
 		});
 	});
 	
-	DESCRIBE("Delayed tests", {
-		IT("should be delayed 1 sec", {
-			sleep(1);
-			TEST_SUCCEED();
-		});
-		IT("should be delayed 2 sec", {
-			sleep(2);	
-			TEST_SUCCEED();
-		});
-		IT("should be delayed 3 sec", {
-			sleep(3);	
-			TEST_SUCCEED();
-		});
-	});
-	
 	DESCRIBE("Cycle describe", {
 		int ind = 0;
 		int bind = 0;
@@ -317,12 +301,105 @@ DESCRIBE_ONLY("[Test]", {
 			});
 		}
 	});
+	
+	DESCRIBE("Scope", {
+		int a = 10;
+		IT("the `a` variable should be between `10` and `15`", {
+			EXPECT(a).toBeLessThan(15);
+			EXPECT(a).toBeGreaterThanOrEqual(10);
+		});
+		IT("`a` should be equals to 10", {
+			EXPECT(a).toBe(10); // Works as expected
+		});
+		DESCRIBE("Inner describe", {
+			IT("`a` should still be equals to 10", {
+				EXPECT(a).toBe(10); // Works as expected
+			});
+		});
+		DESCRIBE("One more inner describe", {
+			int a = 5;
+			BEFORE_ALL({ /* `a` is accesible and equals to 5 */ });
+			IT("`a` should be equals to 5", {
+				EXPECT(a).toBe(5); // As expected
+			});
+		});
+	});
+	
+	DESCRIBE("Step array values", {
+		int* arr;
+		BEFORE_ALL({
+			arr = new int[10];
+			arr[0] = 2;
+			for(int i=1;i<10;i++)
+				arr[i] = arr[i-1]*2;
+		});
+		IT("the 5th item from `arr` should be equal to 32", {
+			EXPECT(arr[4]).toBe(32);
+		});
+		IT("the 10th item from `arr` should be equal to 1024", {
+			EXPECT(arr[9]).toBe(1024);
+		});
+		AFTER_ALL({
+			delete[] arr;
+		});
+	});
+	
+	DESCRIBE("std::set", {
+		std::set<int> s;
+		BEFORE_EACH({
+			s.insert(10);
+			s.insert(15);
+			s.insert(5);
+		});
+		AFTER_EACH({
+			s.clear();
+		});
+		IT("first element of `s` should be 5", {
+			EXPECT(*s.begin()).toBe(5);
+		});
+		IT("last element of `s` should be 15", {
+			EXPECT( *(--s.end()) ).toBe(15);
+		});
+		DESCRIBE("After removing first element from s", {
+			BEFORE_EACH({
+				s.erase(s.begin());
+			});
+			IT("first element of `s` should be 5", {
+				EXPECT(*s.begin()).toBe(10);
+			});
+			IT("last element of `s` should be 15", {
+				EXPECT( *(--s.end()) ).toBe(15);
+			});
+		});
+	});
+	
+	DESCRIBE("Additional variables inside `IT`", {
+		IT("The size of vector should be one more than the size of hash table", {
+			vector<int> v{1,1,2,3,5,8,13};
+			unordered_set<int> s;
+			for(auto &it : v){
+				s.insert(it);
+			}
+			EXPECT(v.size()).toBe(s.size()+1);
+		});
+	});
+	
+	DESCRIBE("Type transform", {
+		IT("Varialbes should be equal", {
+			long a = 10;
+			int exp = 10;
+			EXPECT(a).toBe((long)exp);
+		});
+		
+		IT("Vector size should be 10", {
+			EXPECT((int)(vector<int>{1,2,3,4,5,6,7,8,9,10}).size()).to_be(10);
+		});
+	});
 }); 
 
 
 DESCRIBE("This one is another describe that beside to DESCRIBE_ONLY rule", {
 	
-
 	IT("should not be visilble", {
 		TEST_FAILED();
 	});
@@ -338,7 +415,6 @@ DESCRIBE("This one is another describe that beside to DESCRIBE_ONLY rule", {
 	IT("should not be visible eaither", {
 		TEST_FAILED();
 	});
-	
 });
 
 int main() { return 0; }

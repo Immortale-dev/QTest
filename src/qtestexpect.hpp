@@ -38,9 +38,9 @@ class QTestExpect
 		void to_be_null(){ return toBeNull(); };
 		void to_be_null_ptr(){ return toBeNullPtr(); };
 		template<typename CT>
-		void to_be_iteratble_equal(CT compare){ return toBeIteratableEqual(compare); };
+		void to_be_iterable_equal(CT compare){ return toBeIterableEqual(compare); };
 		template<typename CT>
-		void to_be_iterable_equal(std::initializer_list<CT> list){ return toBeIteratableEqual(list); };
+		void to_be_iterable_equal(std::initializer_list<CT> list){ return toBeIterableEqual(list); };
 		void to_throw_error(){ return toThrowError(); };
 		void to_return_true(){ return toReturnTrue(); };
 		
@@ -103,7 +103,7 @@ void QTestExpect<T>::toBeNullPtr()
 
 template<typename T>
 template<typename CT>
-void QTestExpect<T>::toBeIteratableEqual(CT compare)
+void QTestExpect<T>::toBeIterableEqual(CT compare)
 {
 	bool res = true;
 	auto it=val.begin();
@@ -118,9 +118,9 @@ void QTestExpect<T>::toBeIteratableEqual(CT compare)
 
 template<typename T>
 template<typename CT>
-void QTestExpect<T>::toBeIteratableEqual(std::initializer_list<CT> list)
+void QTestExpect<T>::toBeIterableEqual(std::initializer_list<CT> list)
 {
-	toBeIteratableEqual(std::vector<CT>(list));
+	toBeIterableEqual(std::vector<CT>(list));
 }
 
 template<typename T>

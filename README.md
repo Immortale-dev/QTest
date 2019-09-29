@@ -1,4 +1,5 @@
-![QTest logo](https://webdeveloperukraine.github.io/_resources/qtest/qtest_logo.png)
+
+![QTest logo](https://raw.githubusercontent.com/webdeveloperukraine/webdeveloperukraine.github.io/master/_resources/qtest/qtest_logo.png)
 
 ## What the Freak ?
 
@@ -7,7 +8,7 @@ There is a lot of good test frameworks like google-test or catch2, and if you ar
 Just take a look for the syntax and some examples, and you may fell in love with it :)
 
 ## Table of Contest
-* [WTF?](#what-the)
+* [WTF?](#what-the-freak-)
 * [Build](#build)
 * [Dist](#dist)
 * [Docs](#docs)
@@ -15,36 +16,37 @@ Just take a look for the syntax and some examples, and you may fell in love with
 	* [Syntax](#syntax)
 	* [Code scope](#code-scope)
 	* [Macros](#macros)
-		* [DESCRIBE](#describe)
-		* [DESCRIBE_SKIP](#describe-skip)
-		* [DESCRIBE_ONLY](#describe-only)
-		* [BEFORE_ALL](#before-all)
-		* [AFTER_ALL](#after-all)
-		* [BEFORE_EACH](#before-each)
-		* [AFTER_EACH](#after-each)
-		* [IT](#it)
-		* [IT_SKIP](#it-skip)
-		* [IT_ONLY](#it-only)
-		* [EXPECT](#expect)
-		* [TEST_SUCCEED](#test-succeed)
-		* [TEST_FAILED](#test-failed)
-	* [QTestExpect](#qtestexpect)
-		* [toBe](#tobe)
-		* [toBeCloseTo](#tobecloseto)
-		* [toBeGreaterThan](#tobegreaterthan)
-		* [toBeGreaterThanOrEqual](#tobegreaterthanorequal)
-		* [toBeLessThan](#tobelessthan)
-		* [toBeLessThanOrEqual](#tobelessthanorequal)
-		* [toBeNull](#tobenull)
-		* [toBeNullPtr](#tobenullptr)
-		* [toBeIterableEqual](#tobeiterableequal)
-		* [toThrowError](#tobethrowerror)
-		* [toReturnTrue](#toreturntrue)
-		* [NOT](#not)
+		* [DESCRIBE](#describe-string-description-)
+		* [DESCRIBE_SKIP](#describe_skip-string-description-)
+		* [DESCRIBE_ONLY](#describe_only-string-description-)
+		* [BEFORE_ALL](#before_all-)
+		* [AFTER_ALL](#after_all-)
+		* [BEFORE_EACH](#before_each-)
+		* [AFTER_EACH](#after_each-)
+		* [IT](#it-string-description-)
+		* [IT_SKIP](#it_skip-string-description-)
+		* [IT_ONLY](#it_only-string-description-)
+		* [EXPECT](#expect-t-value)
+		* [TEST_SUCCEED](#test_succeed-)
+		* [TEST_FAILED](#test_failed-)
+	* [QTestExpect](#qtestexpect-t-actual)
+		* [toBe](#tobe-t-compare)
+		* [toBeCloseTo](#tobecloseto-double-compare-double-precision)
+		* [toBeGreaterThan](#tobegreaterthan-t-compare)
+		* [toBeGreaterThanOrEqual](#tobegreaterthanorequal-t-compare)
+		* [toBeLessThan](#tobelessthan-t-compare)
+		* [toBeLessThanOrEqual](#tobelessthanorequal-t-compare)
+		* [toBeNull](#tobenull-)
+		* [toBeNullPtr](#tobenullptr-)
+		* [toBeIterableEqual](#tobeiterableequal-ct-compare)
+		* [toThrowError](#tothrowerror-)
+		* [toReturnTrue](#toreturntrue-)
+		* [NOT](#not-)
 * [Tips](#tips)
 	* [Garbage test result](#garbage-test-result)
 	* [Use cycles to define the test cases](#use-cycles-to-define-the-test-cases)
 	* [Expect object aliases](#expect-object-aliases)
+	* ["ONLY" rule](#only-rule)
 * [More](#more)
 * [License](#license)
 
@@ -58,7 +60,7 @@ This script will build the **test.cpp** program, run it, and clear working direc
 
 ## Dist
 
-Additionally we've generated one file **.hpp** file you can use to include full testing framework functionality. 
+Additionally we've generated single **.hpp** file you can use to include full testing framework functionality. 
 You can find this file placed to **/dist** folder. It is lightweight - less that **25kb** totally. 
 
 
@@ -116,7 +118,7 @@ It is important to follow the syntax rules of building test cases:
 - All `BEFORE_ALL`, `BEFORE_EACH`, `AFTER_ALL` and `AFTER_EACH` macros *must* be called directly from `DESCRIBE` macro wrapper.
 - `DESCRIBE` macros *must* be called from another `DESCRIBE` macro wrappers, or as independent from "test tree" call. 
 
-Non following those rules may cause **undefined** behavior.
+Not following those rules may cause **undefined** behavior.
 
 ***Correct examples:***
 ```C++
@@ -178,7 +180,7 @@ DESCRIBE("...", {
 ____
 
 ### Code scope
-You can use all global variables inside any of *predefined macros*, also, all variables that were defined in one of the `DESCRIBE` macro scope wrapper will be available as a **reference** in all "child" macro calls. You can treat the 
+You can use all global variables inside any of *predefined macros*, also, all variables that were defined in one of the `DESCRIBE` macro code scope will be available as a **reference** in all "child" macro calls. Formally, you can treat the 
 ```C++
 DESCRIBE("...", { /* More code here */ });
 ```
@@ -240,7 +242,7 @@ Lets move through all of them
 ____
 #### DESCRIBE (string description, {})
 `DESCRIBE` macro used to group some test cases, enclose the scope, split up the test cases, and provide the useful description for the group of tests, or preparation part. The description is going to be generated using current and all parent to current `DESCRIBE`'s. 
-It is receive **2** parameters: first is the **string description** - which is the simple text description that will be used to generate the group of test overall description, and the second one is the "code scope" to be ran (see examples to get the better understanding of this second parameter). 
+It is receive **2** parameters: first one is the **string description** - which is the simple text description that will be used to generate the group of test overall description, and the second one is the "code scope" to be ran (see examples to get the better understanding of this second parameter). 
 
 ***Example:***
 Consider we have the next structure of our test cases:
@@ -257,7 +259,7 @@ DESCRIBE("Test numbers", {
 });
 ...
 ```
-And consider we have a `IT` macro (which is the real test definer) placed to each of the describe, the result would be the following:
+And consider we have the `IT` macro (which is the real test definer) placed to each of the describe, the result would be the following:
 - Test numbers
 	- Test case 1
 	- Test case 2
@@ -271,11 +273,11 @@ And consider we have a `IT` macro (which is the real test definer) placed to eac
 	- Test case 2
 	- ...
 
-But if one of `DESCRIBE` blocks does not contain direct `IT` calls,then this group of tests will not be showed (as it is not contains any test cases, so it does not make sense to show it).
+But if one of `DESCRIBE` blocks does not contain direct `IT` calls, then this group of tests will not be showed (as it is not contains any test cases, so it does not make sense to show it).
 ____
 
 #### DESCRIBE_SKIP (string description, {})
-`DESCRIBE_SKIP` macro has the same syntax, call rules and used for the same purposes as `DESCRIBE`, but instead of running the tests, it is actually skip all the tests and test preparations (`BEFORE_...` and `AFTER_...`) of current `DESCRIBE_SKIP` and all of it childrens. 
+`DESCRIBE_SKIP` macro has the same syntax, call rules and used for the same purposes as `DESCRIBE`, but instead of running the tests, it is actually skip all the test cases with its preparations (`BEFORE_...` and `AFTER_...`) of current `DESCRIBE_SKIP` and all of it children ones. 
 
 This macro also used for the debugging purposes, when you want to disable tests to be running, for a while (or intentionally disable some of the test cases).
 
@@ -283,12 +285,12 @@ Skipped tests will anyway be showed in the test results, but they will be marked
 ____
 
 #### DESCRIBE_ONLY (string description, {})
-`DESCRIBE_ONLY` macro has the same syntax, call rules and used for the same purposes as `DESCRIBE`, but it is disabling all tests to be called outside of the current `DESCRIBE_ONLY` block. (All of it childrens will be called as well). 
+`DESCRIBE_ONLY` macro has the same syntax, call rules and used for the same purposes as `DESCRIBE`, but it is disabling all tests to be called outside of the `DESCRIBE_ONLY` (or `IT_ONLY`) blocks. (All of it children tests will be called as well). 
 
-This macro also used for the debugging purposes, when you want to focus on the one or few important `DESCRIBE`'s while building the test cases. 
+This macro also used for the debugging purposes, when you want to focus on one or few important `DESCRIBE`'s while building the test cases. 
 But unlike the `DESCRIBE_SKIP`, tests that was "filtered" by `DESCRIBE_ONLY` rule will not be showed in the test results.
 
-***Important:*** those macros will work as expected only if additionally `TEST_ONLY_RULE` variable is defined before the `#include "qtest.hpp"`. Otherwise it will work as a simple `DESCRIBE` rule.
+***Important:*** this macro will work as expected only if additionally `TEST_ONLY_RULE` variable is defined before the `#include "qtest.hpp"`. Otherwise it will work as a simple `DESCRIBE` rule.
 ***Example:***
 ```C++
 ...
@@ -316,7 +318,7 @@ DESCRIBE("...", {
 ```
 ____
 #### BEFORE_ALL ({})
-This macro requires only the **code scope** to be passed as the first parameter. The code inside the brackets will be called only once, before the first test from the `DESCRIBE` where this `BEFORE_ALL` placed is executed. Usually this rule is used to initialize the variables needed for the test cases.
+This macro requires only the **code scope** to be passed as a first parameter. The code inside the brackets will be called only once, before the first test from the `DESCRIBE` where this `BEFORE_ALL` placed is executed. Usually this rule is used to initialize the variables needed for the test cases.
 ***Example:***
 ```C++
 ...
@@ -393,7 +395,7 @@ DESCRIBE("Test std::set", {
 ____
 
 #### AFTER_EACH ({})
-This macro requires only the **code scope** to be passed as the first parameter. The code inside the brackets will be called after **every** test case of the `DESCRIBE` where this `AFTER_EACH` placed to, and all of this children `DESCRIBE`'s test cases. Usually this rule used to make some variable release memory after each, or clear  mutable changes.
+This macro requires only the **code scope** to be passed as the first parameter. The code inside the brackets will be called after **every** test case of the `DESCRIBE` where this `AFTER_EACH` placed to, and all of this children `DESCRIBE`'s test cases. Usually this rule used to make some variable release memory after each test case, or clear mutable changes.
 ***Example:***
 ```C++
 DESCRIBE("Test std::set", {
@@ -414,12 +416,12 @@ DESCRIBE("Test std::set", {
 ____
 
 #### IT (string description, {})
-This macro is used to define the actual test case. First parameter requires **string** represents the description on test case that will be showed in test results, and the second parameter requires **code scope** of current test. You can define as many additional variables as you need inside the test code scope to execute the actual test.  
+This macro is used to define the actual test case. First parameter requires **string description** that represents the description of the test case that will be showed in test results, and the second parameter is a **code scope** of current test. You can define as many additional variables as you need inside the test code scope to execute the actual test.  
 ***Example:***
 ```C++
 ...
 DESCRIBE("Some very important test", {
-	IT("the size of vector should be the same as hash table", {
+	IT("the size of vector should be one more than the size of hash table", {
 		vector<int> v{1,1,2,3,5,8,13};
 		unordered_set<int> s;
 		for(auto &it : v){
@@ -435,7 +437,7 @@ ____
 #### IT_SKIP (string description, {})
 `IT_SKIP` macro has the same syntax, call rules and used for the same purposes as `IT`, but instead of running the test, it is actually skip it.
 
-This macro also used for the debugging purposes, when you want to disable tests to be running, for a while (or intentionally disable some of the test cases).
+This macro usually used for the debugging purposes, when you want to disable tests to be running for a while (or intentionally disable some of the test cases).
 
 Skipped tests will anyway be showed in the test results, but they will be marked as *"(skipped)"* and indicated with different color.
 ____
@@ -443,15 +445,14 @@ ____
 #### IT_ONLY (string description, {})
 `IT_ONLY` macro has the same syntax, call rules and used for the same purposes as `IT`, but it is disabling all another tests to be called that are not marked as `_ONLY`.
 
-This macro also used for the debugging purposes, when you want to focus on the one or few important test cases.
-But unlike the `IT_SKIP`, tests that was "filtered" by `IT_ONLY` rule will not be showed in the test results.
+This macro also used for the debugging purposes, when you want to focus on the one or few important test cases, but unlike the `IT_SKIP`, tests that were "filtered" by `IT_ONLY` rule will not be showed in the test results.
 
-***Important:*** those macros will work as expected only if additionally `TEST_ONLY_RULE` variable is defined before the `#include "qtest.hpp"`. Otherwise it will work as a simple `DESCRIBE` rule.
+***Important:*** this macro will work as expected only if additionally `TEST_ONLY_RULE` variable is defined before the `#include "qtest.hpp"`. Otherwise it will work as a simple `IT` rule.
 ____
 
 
 #### EXPECT (T value)
-This macro used to resolve the test cases. It is required one parameter to be passed. You can send any **value** type you want to proceed with in your test case, this macro will return **QTestExpect** class instance, which has different methods to proceed with. You can find all available methods in [QTestExpect class](#QTestExpect) section.
+This macro used to resolve the test case. It is required one parameter to be passed. You can send any **value** type you want, this macro will return **QTestExpect** class instance, which has different methods to proceed with. You can find all available methods in [QTestExpect class](#qtestexpect-t-actual) section.
 
 You can use as many `EXPECT` calls as you need for every separate test case.
 ***Exapmle:***
@@ -489,8 +490,9 @@ IT("Should fail", {
 ```
 
 ### QTestExpect (T actual)
-this class used to make some predictions about actual value. It is requires one parameter to be passed (any type allowed). The class contains bunch of methods you can use to assert your actual value with some expected one.
+This class used to make some "predictions" about the value you passed to `EXPECT` macro. It is requires one parameter to be passed (any type allowed). The class contains bunch of methods you can use to assert your actual value with some expected one.
 There is a list of all methods allowed:
+
 - toBe *(to_be)*
 - toBeCloseTo *(to_be_close_to)*
 - toBeGreaterThan *(to_be_greater_than)*
@@ -535,7 +537,7 @@ IT("Classes to be equal", {
 ____
 
 #### toBeCloseTo (double compare, double precision)
-Method used to compare actual value to be within a specified precision of the expected value. It is requires 2 double parameters to be passed: the `compare` and `precision`. This method returns true if actual value lies within the [`compare - precision` , `compare + precision`] range.
+Method used to compare actual value to be within a specified precision of the expected value. It is requires 2 **double** parameters to be passed: the `compare` and `precision`. This method will succeed the test if actual value lies within the [`compare - precision` , `compare + precision`] range.
 ***Example:***
 ```C++
 ...
@@ -641,7 +643,7 @@ IT("vec should toBeIterableEqual to list<int>{5,6,7,8,9}", {
 ____
 
 #### toThrowError ()
-This method requires the **function** to be passed to `EXPECT` macro. When called, it will succeed the test case, if the function passed to `EXPECT` will throw an error.
+This method requires the **function** to be passed to `EXPECT` macro. When called, it will succeed the test case, if the function passed to `EXPECT` is going to throw an error.
 ***Example:***
 ```C++
 EXPECT([](){ throw "error here"; }).toThrowError();
@@ -650,7 +652,7 @@ EXPECT([](){ throw "error here"; }).toThrowError();
 ____
 
 #### toReturnTrue ()
-This method requires the **function** to be passed to `EXPECT` macro. When called, it will succeed the test case, if the function passed to `EXPECT` will return true.
+This method requires the **function** to be passed to `EXPECT` macro. When called, it will succeed the test case, if the function passed to `EXPECT` is going to return `true`.
 ***Example:***
 ```C++
 EXPECT([]() -> bool { return 1; }).toReturnTrue();
@@ -729,10 +731,14 @@ EXPECT(15.5).to_be_close_to(15,0.5);
 EXPECT([](){...}).NOT().to_throw_error();
 ...
 ```
+____
+
+### "ONLY" rule
+If you are going to use `DESCRIBE_ONLY` or `IT_ONLY` macros, don't forget to put `#define TEST_ONLY_RULE` before the `#include "qtest.hpp"`
 
 ## More
 
-If you found some issues related to QTest, feel free to post them to [issue tracker](https://github.com/webdeveloperukraine/QTest/issues) here on github. 
+If you found some issues, or you have some questions about related to **QTest**, feel free to post them to [issue tracker](https://github.com/webdeveloperukraine/QTest/issues) here on github. 
 
 ## License
 
