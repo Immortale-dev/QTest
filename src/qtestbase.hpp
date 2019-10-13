@@ -141,6 +141,14 @@ void QTestBase::callback()
 		current = it;
 		current->fn();
 	}
+	
+	bool precall_tests = (!tests_only || n->precall || n->only);
+	if(!n->skip && precall_tests){
+		// if at least one test from tree path was called
+		// call current node after_all functions as we are 
+		// going to leave this node
+		call_after_all(n);
+	}
 }
 
 void QTestBase::describe(string str, function_cb_t fnn, int param, const char* file)
@@ -380,7 +388,6 @@ void QTestBase::run_tests(node* n)
 	prepare_node(n);
 	
 	bool have_callable_tests = false;
-	bool precall_tests = (!tests_only || n->precall || n->only);
 	
 	// check for any test to be executed in scope of this node
 	for(auto it : n->tests){
@@ -427,13 +434,6 @@ void QTestBase::run_tests(node* n)
 			if(!current_test->skip){
 				call_after_each(n);
 			}
-		}
-		
-		if(!n->skip && precall_tests){
-			// if at least one test from tree path was called
-			// call current node after_all functions as we are 
-			// going to leave this node
-			call_after_all(n);
 		}
 	}
 }

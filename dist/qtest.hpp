@@ -631,6 +631,10 @@ void QTestBase::callback()
 		current = it;
 		current->fn();
 	}
+	bool precall_tests = (!tests_only || n->precall || n->only);
+	if(!n->skip && precall_tests){
+		call_after_all(n);
+	}
 }
 
 void QTestBase::describe(string str, function_cb_t fnn, int param, const char* file)
@@ -851,7 +855,6 @@ void QTestBase::run_tests(node* n)
 	string descr = generate_description(n);
 	prepare_node(n);
 	bool have_callable_tests = false;
-	bool precall_tests = (!tests_only || n->precall || n->only);
 	for(auto it : n->tests){
 		if(it->only)
 			have_callable_tests = true;
@@ -881,9 +884,6 @@ void QTestBase::run_tests(node* n)
 			if(!current_test->skip){
 				call_after_each(n);
 			}
-		}
-		if(!n->skip && precall_tests){
-			call_after_all(n);
 		}
 	}
 }
