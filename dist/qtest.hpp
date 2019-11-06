@@ -28,7 +28,7 @@
 #define Q_TEST__DESCRIBE_STRUCT(...) QTestDescribe_t Q_TEST__UNIQ_NAME() (__VA_ARGS__)
 #define Q_TEST__CALLBACK() QTestFinally<function_cb_t> Q_TEST__UNIQ_NAME() ([](){ QTESTOBJECTDEFINED.callback(); })
 #define Q_TEST__CALLBACK_ARG() QTestFinally<function_cb_t> ([](){ QTESTOBJECTDEFINED.callback(); })
-#define Q_TEST__DESCRIBE(...) Q_TEST__DESCRIBE_STRUCT(__VA_ARGS__)
+#define Q_TEST__DESCRIBE(...) Q_TEST__DESCRIBE_STRUCT(__VA_ARGS__); Q_TEST__CALLBACK()
 #define Q_TEST__LAMBDA(...) [Q_TEST__SCOPE]()__VA_ARGS__
 #define Q_TEST__LAMBDA_CALLBACK(...) Q_TEST__LAMBDA({ do __VA_ARGS__ while( (QTESTOBJECTDEFINED.callback(), false) ); })
 
@@ -40,9 +40,10 @@
 #define AFTER_ALL(...) QTESTOBJECTDEFINED.after(Q_TEST__LAMBDA(__VA_ARGS__))
 #define AFTER_EACH(...) QTESTOBJECTDEFINED.after_each(Q_TEST__LAMBDA(__VA_ARGS__))
 #define IT(a, ...) QTESTOBJECTDEFINED.it(a, Q_TEST__LAMBDA(__VA_ARGS__), QTEST_TEST_PARAM_ID)
-#define IT_ONLY(a, ...) QTESTOBJECTDEFINED.it(a, Q_TEST__LAMBDA(__VA_ARGS__), QTEST_ONLY_PARAM_ID)
-#define IT_SKIP(a, ...) QTESTOBJECTDEFINED.it(a, Q_TEST__LAMBDA(__VA_ARGS__), QTEST_SKIP_PARAM_ID)
+#define IT_ONLY(a, ...) QTESTOBJECTDEFINED.it(a, Q_TEST__LAMBDA(__VA_ARGS__), QTEST_ONLY_PARAM_ID); Q_TEST__CALLBACK()
+#define IT_SKIP(a, ...) QTESTOBJECTDEFINED.it(a, Q_TEST__LAMBDA(__VA_ARGS__), QTEST_SKIP_PARAM_ID); Q_TEST__CALLBACK()
 #define EXPECT(a) QTESTOBJECTDEFINED.expect((a))
+#define INFO_PRINT(a) QTESTOBJECTDEFINED.info_print(a)
 #define TEST_FAILED() EXPECT(1).toBe(0)
 #define TEST_SUCCEED() EXPECT(1).toBe(1)
 
@@ -207,11 +208,13 @@ bool QTestExpect<T>::proceed_result(bool result)
 class QTestPrint
 {
 	using string = std::string;
+	using test_infos = std::vector<string>;
 	public:
 		QTestPrint();
 		void print_description(string& str);
 		void print_description_extended(string& str, string& file);
 		void print_test(string& str, bool good, bool skipped);
+		void print_test_info(test_infos& arr);
 		void print_falied_test(string& str);
 		void print_statistics(int tests_count, int tests_failed, int tests_skipped);
 		void print_start();
@@ -294,6 +297,16 @@ void QTestPrint::print_test(string& str, bool good, bool skipped)
 	if(skipped)
 		print_neutral(" ("+skipped_txt+")");
 	print(newline);
+}
+
+void QTestPrint::print_test_info(test_infos& arr)
+{
+	for(auto& it : arr){
+		print("        ");
+		print(" - ");
+		print_grey(it);
+		print(newline);
+	}
 }
 
 void QTestPrint::print_falied_test(string& str)
@@ -524,6 +537,7 @@ class QTestBase
 	using function_cb_t = std::function<void()>;
 	using string = std::string;
 	using func_arr = std::vector<func*>;
+	using info_prints_t = std::vector<string>;
 	struct func
 	{
 		function_cb_t fn;
@@ -536,6 +550,7 @@ class QTestBase
 		bool result = true;
 		bool only;
 		bool skip;
+		info_prints_t info_prints;
 		test(string str, function_cb_t fn) : descr(str), fn(fn) {};
 	};
 	struct node
@@ -563,6 +578,7 @@ class QTestBase
 		void after_each(function_cb_t fn);
 		void it(string str, function_cb_t fn, int param);
 		void callback();
+		void info_print(string str);
 		template<typename T>
 		QTestExpect<T> expect(T a);
 		
@@ -653,7 +669,7 @@ void QTestBase::describe(string str, function_cb_t fnn, int param, const char* f
 			tmp->precall = true;
 			tmp = tmp->parent;
 		}
-	} 
+	}
 }
 
 void QTestBase::before(function_cb_t fn)
@@ -689,6 +705,11 @@ void QTestBase::it(string str, function_cb_t fn, int param)
 		}
 	}
 	current->tests.push_back(t);
+}
+
+void QTestBase::info_print(string str)
+{
+	current_test->info_prints.push_back(str);
 }
 
 template<typename T>
@@ -780,6 +801,9 @@ QTestBase::func_arr QTestBase::get_before_each(node* n)
 	while(temp){
 		for(int i=temp->before_each.size()-1;i>=0;i--)
 			beforeEach.push_back(temp->before_each[i]);
+		for(int i=temp->before_all.size()-1;i>=0;i--)
+			beforeEach.push_back(temp->before_all[i]);
+		temp->before_all.resize(0);
 		temp = temp->parent;
 	}
 	std::reverse(beforeEach.begin(), beforeEach.end());
@@ -862,14 +886,11 @@ void QTestBase::run_tests(node* n)
 	if(n->tests.size()){
 		if(!tests_only || have_callable_tests){
 			P->print_description(descr);
-			if(!n->skip){
-				call_before_all(n);
-			}
 		}
 		for(auto it : n->tests){
 			current_test = it;
 			if(tests_only && !current_test->only)
-				continue;	
+				continue;
 			if(!current_test->skip){
 				call_before_each(n);
 			}
@@ -881,6 +902,7 @@ void QTestBase::run_tests(node* n)
 			if(!current_test->result)
 				tests_failed++;
 			P->print_test(current_test->descr, current_test->result, current_test->skip);
+			P->print_test_info(current_test->info_prints);
 			if(!current_test->skip){
 				call_after_each(n);
 			}

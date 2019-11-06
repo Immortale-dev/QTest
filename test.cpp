@@ -284,24 +284,6 @@ DESCRIBE_ONLY("[Test]", {
 		});
 	});
 	
-	DESCRIBE("Cycle describe", {
-		int ind = 0;
-		int bind = 0;
-		
-		BEFORE_EACH({
-			bind++;
-		});
-		
-		for(int i=0;i<10;i++){
-			DESCRIBE("D - "+to_string(i), {
-				ind++;
-				IT("`ind` should be euqal "+to_string(bind), {
-					EXPECT(ind).toBe(bind);
-				});
-			});
-		}
-	});
-	
 	DESCRIBE("Scope", {
 		int a = 10;
 		IT("the `a` variable should be between `10` and `15`", {
@@ -395,6 +377,33 @@ DESCRIBE_ONLY("[Test]", {
 			EXPECT((int)(vector<int>{1,2,3,4,5,6,7,8,9,10}).size()).to_be(10);
 		});
 	});
+	
+	DESCRIBE("Hooks order", {
+		vector<int> order_list;
+		BEFORE_ALL({
+			order_list.push_back(1);
+		});
+		BEFORE_EACH({
+			order_list.push_back(2);
+		});
+		
+		DESCRIBE("with multi level of DESCRIBE's", {
+			BEFORE_EACH({
+				order_list.push_back(4);
+			});
+			BEFORE_ALL({
+				order_list.push_back(3);
+			});
+			
+			IT("`order_list should contains values {1,2,2,3,4}`", {
+				EXPECT(order_list).toBeIterableEqual({1,2,2,3,4});
+			});
+		});
+		
+		IT("`order_list` should contains values {1,2}", {
+			EXPECT(order_list).toBeIterableEqual({1,2});
+		});
+	});
 }); 
 
 
@@ -410,6 +419,7 @@ DESCRIBE("This one is another describe that beside to DESCRIBE_ONLY rule", {
 	
 	IT_ONLY("should be visible as IT_ONLY rule applied", {
 		TEST_SUCCEED();
+		INFO_PRINT("some additional info");
 	});
 	
 	IT("should not be visible eaither", {

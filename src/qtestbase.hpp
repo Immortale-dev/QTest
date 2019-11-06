@@ -19,6 +19,7 @@ class QTestBase
 	using function_cb_t = std::function<void()>;
 	using string = std::string;
 	using func_arr = std::vector<func*>;
+	using info_prints_t = std::vector<string>;
 	
 	struct func
 	{
@@ -32,6 +33,7 @@ class QTestBase
 		bool result = true;
 		bool only;
 		bool skip;
+		info_prints_t info_prints;
 		test(string str, function_cb_t fn) : descr(str), fn(fn) {};
 	};
 	struct node
@@ -61,6 +63,7 @@ class QTestBase
 		void after_each(function_cb_t fn);
 		void it(string str, function_cb_t fn, int param);
 		void callback();
+		void info_print(string str);
 		template<typename T>
 		QTestExpect<T> expect(T a);
 		
@@ -212,6 +215,11 @@ void QTestBase::it(string str, function_cb_t fn, int param)
 	current->tests.push_back(t);
 }
 
+void QTestBase::info_print(string str)
+{
+	current_test->info_prints.push_back(str);
+}
+
 template<typename T>
 QTestExpect<T> QTestBase::expect(T a)
 {
@@ -310,6 +318,9 @@ QTestBase::func_arr QTestBase::get_before_each(node* n)
 	while(temp){
 		for(int i=temp->before_each.size()-1;i>=0;i--)
 			beforeEach.push_back(temp->before_each[i]);
+		for(int i=temp->before_all.size()-1;i>=0;i--)
+			beforeEach.push_back(temp->before_all[i]);
+		temp->before_all.resize(0);
 		temp = temp->parent;
 	}
 	std::reverse(beforeEach.begin(), beforeEach.end());
@@ -398,13 +409,6 @@ void QTestBase::run_tests(node* n)
 	if(n->tests.size()){
 		if(!tests_only || have_callable_tests){
 			P->print_description(descr);
-			if(!n->skip){
-				// if we found at least one test that should
-				// be executed while moving through the node tree
-				// run and remove all before_all tests from root
-				// to current node
-				call_before_all(n);
-			}
 		}
 		
 		for(auto it : n->tests){
@@ -430,6 +434,7 @@ void QTestBase::run_tests(node* n)
 
 			// Print test
 			P->print_test(current_test->descr, current_test->result, current_test->skip);
+			P->print_test_info(current_test->info_prints);
 			
 			if(!current_test->skip){
 				call_after_each(n);

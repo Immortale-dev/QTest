@@ -10,6 +10,7 @@
 #include <unistd.h>
 #endif
 
+#include <vector>
 #include <iostream>
 #include <string>
 #include <algorithm>
@@ -17,12 +18,14 @@
 class QTestPrint
 {
 	using string = std::string;
+	using test_infos = std::vector<string>;
 	
 	public:
 		QTestPrint();
 		void print_description(string& str);
 		void print_description_extended(string& str, string& file);
 		void print_test(string& str, bool good, bool skipped);
+		void print_test_info(test_infos& arr);
 		void print_falied_test(string& str);
 		void print_statistics(int tests_count, int tests_failed, int tests_skipped);
 		void print_start();
@@ -113,6 +116,16 @@ void QTestPrint::print_test(string& str, bool good, bool skipped)
 		print_neutral(" ("+skipped_txt+")");
 	
 	print(newline);
+}
+
+void QTestPrint::print_test_info(test_infos& arr)
+{
+	for(auto& it : arr){
+		print("        ");
+		print(" - ");
+		print_grey(it);
+		print(newline);
+	}
 }
 
 void QTestPrint::print_falied_test(string& str)

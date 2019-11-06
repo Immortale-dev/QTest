@@ -1,4 +1,5 @@
 
+
 ![QTest logo](https://raw.githubusercontent.com/webdeveloperukraine/webdeveloperukraine.github.io/master/_resources/qtest/qtest_logo.png)
 
 ## What the Freak ?
@@ -29,6 +30,7 @@ Just take a look for the syntax and some examples, and you may fell in love with
 		* [EXPECT](#expect-t-value)
 		* [TEST_SUCCEED](#test_succeed-)
 		* [TEST_FAILED](#test_failed-)
+		* [INFO_PRINT](#info-print-string-str)
 	* [QTestExpect](#qtestexpect-t-actual)
 		* [toBe](#tobe-t-compare)
 		* [toBeCloseTo](#tobecloseto-double-compare-double-precision)
@@ -70,7 +72,7 @@ You can find this file placed to **/dist** folder. It is lightweight - less that
 
 QTest is a behaviour driven C++ test framework. To start working with it, you need to include **qtest.hpp** file to your test project. You can download single **qtest.hpp** file from **/dist** folder of this repository, or use it separated.
 
-After **.hpp** file included, you can start writing tests using several predefined macros explained in the **Macros** section of documentation
+After **.hpp** file included, you can start writing tests using several predefined macros explained in the **Macros** section of documentation.
 
 We will move through all of them below.
 
@@ -174,6 +176,13 @@ DESCRIBE("...", {
 		// Incorrect. You MUST use `BEFORE_ALL` directly from `DESCRIBE`
 		BEFORE_ALL({ ... });
 	});
+
+	if(stars_lined_up){
+		// Incorrect. You MUST use `IT` directly from `DESCRIBE` code scope (not from `if`, `while` or any another)
+		IT("...", {
+			EXPECT(...).[...](...);
+		});
+	}
 });
 ...
 ```
@@ -216,7 +225,7 @@ DESCRIBE("Some test", {
 ____
 
 ### Macros
-To build you test cases you are allowed to use the following predefined c++ macro functions
+To build you test cases you are allowed to use the following predefined c++ macro functions:
 
 - DESCRIBE
 - BEFORE_ALL
@@ -233,16 +242,20 @@ Few more macros that allow us to debug code while testing it:
 - IT_SKIP
 - IT_ONLY
 
-And two more macros to work with test cases.
+Two more macros to work with test cases:
 
-- TEST_SUCCEED;
-- TEST_FAILED;
+- TEST_SUCCEED
+- TEST_FAILED
+
+And one macro for providing additional information to the test case result:
+
+- INFO_PRINT
 
 Lets move through all of them
 ____
 #### DESCRIBE (string description, {})
 `DESCRIBE` macro used to group some test cases, enclose the scope, split up the test cases, and provide the useful description for the group of tests, or preparation part. The description is going to be generated using current and all parent to current `DESCRIBE`'s. 
-It is receive **2** parameters: first one is the **string description** - which is the simple text description that will be used to generate the group of test overall description, and the second one is the "code scope" to be ran (see examples to get the better understanding of this second parameter). 
+It is receive **2** parameters: first one is the **string description** - which is the simple text description that will be used to generate the group of test overall description, and the second one is the "code scope" to be ran (see examples to get the better understanding). 
 
 ***Example:***
 Consider we have the next structure of our test cases:
@@ -259,7 +272,7 @@ DESCRIBE("Test numbers", {
 });
 ...
 ```
-And consider we have the `IT` macro (which is the real test definer) placed to each of the describe, the result would be the following:
+And consider we have the `IT` macro (which is the real test definer) placed to each of the "describe", the result would be the following:
 - Test numbers
 	- Test case 1
 	- Test case 2
@@ -427,7 +440,7 @@ DESCRIBE("Some very important test", {
 		for(auto &it : v){
 			s.insert(it);
 		}
-		EXPECT(v.size()).toBe(s.size());
+		EXPECT(v.size()).toBe(s.size() + 1);
 	});
 });
 ...
@@ -485,6 +498,21 @@ This macro requires no parameters to be passed, and used only inside the `IT` ma
 ...
 IT("Should fail", {
 	TEST_FAILED();
+});
+...
+```
+____
+
+#### INFO_PRINT (string str)
+This macro requires one parameter to be passed **string str** and used to provide additional information to the test case. Used only inside the `IT` macro **code scope** and will print the text you pass after the test case result.
+***Example:***
+```C++
+...
+IT("Additional info", {
+	if(stars_lined_up){
+		TEST_SUCCEED();
+		INFO_PRINT("Stars Lined Up");
+	}
 });
 ...
 ```
@@ -696,8 +724,8 @@ DESCRIBE("...", {
 ```
 ____
 
-### Use cycles to define the test cases
-If, for example, you want a lot different input values to be passed to test your object method, and you don't want to write the test case explicitly for each input value, you could use the **cycles** to prepare your test case. 
+### Cycles or conditions
+You are **not allowed** to use cycles for tests definitions.
 ***Example:***
 ```C++
 ...
@@ -718,7 +746,7 @@ DESCRIBE("Test `calc` method", {
 });
 ...
 ```
-Works the same with `DESCRIBE` macros.
+It will not work as you **MUST** call `IT` directly from `DESCRIBE` macro block scope. Same with `DESCRIBE` macros.
 ____
 
 ### Expect object aliases
