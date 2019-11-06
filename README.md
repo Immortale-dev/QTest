@@ -1,5 +1,6 @@
 
 
+
 ![QTest logo](https://raw.githubusercontent.com/webdeveloperukraine/webdeveloperukraine.github.io/master/_resources/qtest/qtest_logo.png)
 
 ## What the Freak ?
@@ -30,7 +31,7 @@ Just take a look for the syntax and some examples, and you may fell in love with
 		* [EXPECT](#expect-t-value)
 		* [TEST_SUCCEED](#test_succeed-)
 		* [TEST_FAILED](#test_failed-)
-		* [INFO_PRINT](#info-print-string-str)
+		* [INFO_PRINT](#info_print-string-str)
 	* [QTestExpect](#qtestexpect-t-actual)
 		* [toBe](#tobe-t-compare)
 		* [toBeCloseTo](#tobecloseto-double-compare-double-precision)
@@ -46,7 +47,7 @@ Just take a look for the syntax and some examples, and you may fell in love with
 		* [NOT](#not-)
 * [Tips](#tips)
 	* [Garbage test result](#garbage-test-result)
-	* [Use cycles to define the test cases](#use-cycles-to-define-the-test-cases)
+	* [Cycles and conditions](#cycles-and-conditions)
 	* [Expect object aliases](#expect-object-aliases)
 	* ["ONLY" rule](#only-rule)
 * [More](#more)
@@ -724,7 +725,7 @@ DESCRIBE("...", {
 ```
 ____
 
-### Cycles or conditions
+### Cycles and conditions
 You are **not allowed** to use cycles for tests definitions.
 ***Example:***
 ```C++
@@ -747,6 +748,18 @@ DESCRIBE("Test `calc` method", {
 ...
 ```
 It will not work as you **MUST** call `IT` directly from `DESCRIBE` macro block scope. Same with `DESCRIBE` macros.
+
+But it is allowed to use cycles and conditions inside the `IT` macro.
+***Example:***
+```C++
+...
+IT("Bunch of checks", {
+    for(int i=0;i<10;i++){
+        EXPECT(i).toBeLessThan(10);
+    }
+});
+...
+```
 ____
 
 ### Expect object aliases
