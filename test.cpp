@@ -10,7 +10,7 @@
 using namespace std;
 
 DESCRIBE_ONLY("[Test]", {
-		
+    
 	DESCRIBE("Second level", {
 		IT("should succeed as TEST_SUCCEED method used", {
 			TEST_SUCCEED();
