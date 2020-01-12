@@ -76,18 +76,18 @@ class QTestPrint
 };
 
 
-QTestPrint::QTestPrint()
+inline QTestPrint::QTestPrint()
 {
 	processConsoleWindow();
 }
 
-void QTestPrint::print_description(string& str)
+inline void QTestPrint::print_description(string& str)
 {
 	print(newline);
 	print(" "+str+newline);
 }
 
-void QTestPrint::print_description_extended(string& str, string& file)
+inline void QTestPrint::print_description_extended(string& str, string& file)
 {
 	print(newline);
 	print(" "+str);
@@ -95,7 +95,7 @@ void QTestPrint::print_description_extended(string& str, string& file)
 	print(newline);
 }
 
-void QTestPrint::print_test(string& str, bool good, bool skipped)
+inline void QTestPrint::print_test(string& str, bool good, bool skipped)
 {
 	print("    ");
 	
@@ -118,7 +118,7 @@ void QTestPrint::print_test(string& str, bool good, bool skipped)
 	print(newline);
 }
 
-void QTestPrint::print_test_info(test_infos& arr)
+inline void QTestPrint::print_test_info(test_infos& arr)
 {
 	for(auto& it : arr){
 		print("        ");
@@ -128,7 +128,7 @@ void QTestPrint::print_test_info(test_infos& arr)
 	}
 }
 
-void QTestPrint::print_falied_test(string& str)
+inline void QTestPrint::print_falied_test(string& str)
 {
 	print(tab);
 	print_error_sign();
@@ -137,22 +137,22 @@ void QTestPrint::print_falied_test(string& str)
 	print(newline);
 }
 
-void QTestPrint::print_error_sign()
+inline void QTestPrint::print_error_sign()
 {
 	print_error(fail_sign);
 }
 
-void QTestPrint::print_success_sign()
+inline void QTestPrint::print_success_sign()
 {
 	print_success(succ_sign);
 }
 
-void QTestPrint::print_skip_sign()
+inline void QTestPrint::print_skip_sign()
 {
 	print_neutral(skip_sign);
 }
 
-void QTestPrint::print_statistics(int tests_count, int tests_failed, int tests_skipped)
+inline void QTestPrint::print_statistics(int tests_count, int tests_failed, int tests_skipped)
 {
 	print(newline);
 	print_title(toupper(statistics_txt));
@@ -179,13 +179,13 @@ void QTestPrint::print_statistics(int tests_count, int tests_failed, int tests_s
 	print(newline);
 }
 
-void QTestPrint::print_start()
+inline void QTestPrint::print_start()
 {
 	print_delimeter("_");
 	print_title(toupper(testing_txt));
 }
 
-std::string QTestPrint::create_titled_message(string str)
+inline std::string QTestPrint::create_titled_message(string str)
 {
 	string ret = "";
 	int blength = line_length-(int)str.size();
@@ -197,63 +197,63 @@ std::string QTestPrint::create_titled_message(string str)
 	return ret;
 }
 
-void QTestPrint::print_title(string str)
+inline void QTestPrint::print_title(string str)
 {
 	print(create_titled_message(str));
 }
 
-void QTestPrint::print_delimeter()
+inline void QTestPrint::print_delimeter()
 {
 	print_delimeter(delim_txt);
 }
 
-void QTestPrint::print_delimeter(string c)
+inline void QTestPrint::print_delimeter(string c)
 {
 	for(int i=0;i<line_length;i++)
 		print(c);
 }
 
-void QTestPrint::print(string s)
+inline void QTestPrint::print(string s)
 {
 	std::cout << s;
 }
 
-void QTestPrint::print_error(string s)
+inline void QTestPrint::print_error(string s)
 {
 	set_color_error();
 	print(s);
 	set_color_default();
 }
 
-void QTestPrint::print_success(string s)
+inline void QTestPrint::print_success(string s)
 {
 	set_color_success();
 	print(s);
 	set_color_default();
 }
 
-void QTestPrint::print_neutral(string s)
+inline void QTestPrint::print_neutral(string s)
 {
 	set_color_neutral();
 	print(s);
 	set_color_default();
 }
 
-void QTestPrint::print_grey(string s)
+inline void QTestPrint::print_grey(string s)
 {
 	set_color_grey();
 	print(s);
 	set_color_default();
 }
 
-std::string QTestPrint::toupper(string txt)
+inline std::string QTestPrint::toupper(string txt)
 {
 	string txtc(txt);
 	std::transform(txtc.begin(), txtc.end(), txtc.begin(), ::toupper); 
 	return txtc;
 }
 
-void QTestPrint::processConsoleWindow()
+inline void QTestPrint::processConsoleWindow()
 {
 	#ifdef _WIN32
 		hConsole = GetStdHandle (STD_OUTPUT_HANDLE);
@@ -269,32 +269,32 @@ void QTestPrint::processConsoleWindow()
     #endif
 }
 
-void QTestPrint::set_color_default()
+inline void QTestPrint::set_color_default()
 {
 	set_color(Color::Default);
 }
 
-void QTestPrint::set_color_error()
+inline void QTestPrint::set_color_error()
 {
 	set_color(Color::Error);
 }
 
-void QTestPrint::set_color_success()
+inline void QTestPrint::set_color_success()
 {
 	set_color(Color::Success);
 }
 
-void QTestPrint::set_color_neutral()
+inline void QTestPrint::set_color_neutral()
 {
 	set_color(Color::Neutral);
 }
 
-void QTestPrint::set_color_grey()
+inline void QTestPrint::set_color_grey()
 {
 	set_color(Color::Grey);
 }
 
-void QTestPrint::set_color(Color c)
+inline void QTestPrint::set_color(Color c)
 {
 	#ifdef TEST_RESULTS_NO_COLOR
 		return;
@@ -340,12 +340,12 @@ void QTestPrint::set_color(Color c)
 	#endif
 }
 
-void QTestPrint::print_succeed_message()
+inline void QTestPrint::print_succeed_message()
 {
 	print_success(create_titled_message(toupper(succeed_txt)));
 }
 
-void QTestPrint::print_failure_message()
+inline void QTestPrint::print_failure_message()
 {
 	print_error(create_titled_message(toupper(failed_txt)));
 }

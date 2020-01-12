@@ -4,15 +4,13 @@ CC=g++
 CFLAGS=-c -Wall -x c++
 LDFLAGS=
 SRCPATH:=src/
-SRCS:=$(wildcard $(SRCPATH)*.hpp)
-OBJS:=$(SRCS:%.hpp=%.o)
 
 all: generate_o generate_t
 	
-generate_o: ${OBJS}
+generate_o:
 	${CC} ${CFLAGS} test.cpp -o test.o -Isrc
 	
-%.o: %.hpp
+%.o: %.cpp
 	${CC} ${CFLAGS} $< -o $@
 
 generate_t:
