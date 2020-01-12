@@ -261,18 +261,18 @@ class QTestPrint
 		void set_color(Color c);
 };
 
-QTestPrint::QTestPrint()
+inline QTestPrint::QTestPrint()
 {
 	processConsoleWindow();
 }
 
-void QTestPrint::print_description(string& str)
+inline void QTestPrint::print_description(string& str)
 {
 	print(newline);
 	print(" "+str+newline);
 }
 
-void QTestPrint::print_description_extended(string& str, string& file)
+inline void QTestPrint::print_description_extended(string& str, string& file)
 {
 	print(newline);
 	print(" "+str);
@@ -280,7 +280,7 @@ void QTestPrint::print_description_extended(string& str, string& file)
 	print(newline);
 }
 
-void QTestPrint::print_test(string& str, bool good, bool skipped)
+inline void QTestPrint::print_test(string& str, bool good, bool skipped)
 {
 	print("    ");
 	if(skipped){
@@ -299,7 +299,7 @@ void QTestPrint::print_test(string& str, bool good, bool skipped)
 	print(newline);
 }
 
-void QTestPrint::print_test_info(test_infos& arr)
+inline void QTestPrint::print_test_info(test_infos& arr)
 {
 	for(auto& it : arr){
 		print("        ");
@@ -309,7 +309,7 @@ void QTestPrint::print_test_info(test_infos& arr)
 	}
 }
 
-void QTestPrint::print_falied_test(string& str)
+inline void QTestPrint::print_falied_test(string& str)
 {
 	print(tab);
 	print_error_sign();
@@ -318,22 +318,22 @@ void QTestPrint::print_falied_test(string& str)
 	print(newline);
 }
 
-void QTestPrint::print_error_sign()
+inline void QTestPrint::print_error_sign()
 {
 	print_error(fail_sign);
 }
 
-void QTestPrint::print_success_sign()
+inline void QTestPrint::print_success_sign()
 {
 	print_success(succ_sign);
 }
 
-void QTestPrint::print_skip_sign()
+inline void QTestPrint::print_skip_sign()
 {
 	print_neutral(skip_sign);
 }
 
-void QTestPrint::print_statistics(int tests_count, int tests_failed, int tests_skipped)
+inline void QTestPrint::print_statistics(int tests_count, int tests_failed, int tests_skipped)
 {
 	print(newline);
 	print_title(toupper(statistics_txt));
@@ -357,13 +357,13 @@ void QTestPrint::print_statistics(int tests_count, int tests_failed, int tests_s
 	print(newline);
 }
 
-void QTestPrint::print_start()
+inline void QTestPrint::print_start()
 {
 	print_delimeter("_");
 	print_title(toupper(testing_txt));
 }
 
-std::string QTestPrint::create_titled_message(string str)
+inline std::string QTestPrint::create_titled_message(string str)
 {
 	string ret = "";
 	int blength = line_length-(int)str.size();
@@ -375,63 +375,63 @@ std::string QTestPrint::create_titled_message(string str)
 	return ret;
 }
 
-void QTestPrint::print_title(string str)
+inline void QTestPrint::print_title(string str)
 {
 	print(create_titled_message(str));
 }
 
-void QTestPrint::print_delimeter()
+inline void QTestPrint::print_delimeter()
 {
 	print_delimeter(delim_txt);
 }
 
-void QTestPrint::print_delimeter(string c)
+inline void QTestPrint::print_delimeter(string c)
 {
 	for(int i=0;i<line_length;i++)
 		print(c);
 }
 
-void QTestPrint::print(string s)
+inline void QTestPrint::print(string s)
 {
 	std::cout << s;
 }
 
-void QTestPrint::print_error(string s)
+inline void QTestPrint::print_error(string s)
 {
 	set_color_error();
 	print(s);
 	set_color_default();
 }
 
-void QTestPrint::print_success(string s)
+inline void QTestPrint::print_success(string s)
 {
 	set_color_success();
 	print(s);
 	set_color_default();
 }
 
-void QTestPrint::print_neutral(string s)
+inline void QTestPrint::print_neutral(string s)
 {
 	set_color_neutral();
 	print(s);
 	set_color_default();
 }
 
-void QTestPrint::print_grey(string s)
+inline void QTestPrint::print_grey(string s)
 {
 	set_color_grey();
 	print(s);
 	set_color_default();
 }
 
-std::string QTestPrint::toupper(string txt)
+inline std::string QTestPrint::toupper(string txt)
 {
 	string txtc(txt);
 	std::transform(txtc.begin(), txtc.end(), txtc.begin(), ::toupper); 
 	return txtc;
 }
 
-void QTestPrint::processConsoleWindow()
+inline void QTestPrint::processConsoleWindow()
 {
 	#ifdef _WIN32
 		hConsole = GetStdHandle (STD_OUTPUT_HANDLE);
@@ -447,32 +447,32 @@ void QTestPrint::processConsoleWindow()
     #endif
 }
 
-void QTestPrint::set_color_default()
+inline void QTestPrint::set_color_default()
 {
 	set_color(Color::Default);
 }
 
-void QTestPrint::set_color_error()
+inline void QTestPrint::set_color_error()
 {
 	set_color(Color::Error);
 }
 
-void QTestPrint::set_color_success()
+inline void QTestPrint::set_color_success()
 {
 	set_color(Color::Success);
 }
 
-void QTestPrint::set_color_neutral()
+inline void QTestPrint::set_color_neutral()
 {
 	set_color(Color::Neutral);
 }
 
-void QTestPrint::set_color_grey()
+inline void QTestPrint::set_color_grey()
 {
 	set_color(Color::Grey);
 }
 
-void QTestPrint::set_color(Color c)
+inline void QTestPrint::set_color(Color c)
 {
 	#ifdef TEST_RESULTS_NO_COLOR
 		return;
@@ -518,12 +518,12 @@ void QTestPrint::set_color(Color c)
 	#endif
 }
 
-void QTestPrint::print_succeed_message()
+inline void QTestPrint::print_succeed_message()
 {
 	print_success(create_titled_message(toupper(succeed_txt)));
 }
 
-void QTestPrint::print_failure_message()
+inline void QTestPrint::print_failure_message()
 {
 	print_error(create_titled_message(toupper(failed_txt)));
 }
@@ -612,14 +612,14 @@ class QTestBase
 };
 
 
-QTestBase::QTestBase()
+inline QTestBase::QTestBase()
 {
 	reset();
 	P = new QTestPrint();
 	P->print_start();
 }
 
-QTestBase::~QTestBase()
+inline QTestBase::~QTestBase()
 {
 	P->print_statistics(tests_count, tests_failed, tests_skipped);
 	if(tests_failed){
@@ -636,7 +636,7 @@ QTestBase::~QTestBase()
 	}
 }
 
-void QTestBase::callback()
+inline void QTestBase::callback()
 {
 	if(current->called)
 		return;
@@ -653,7 +653,7 @@ void QTestBase::callback()
 	}
 }
 
-void QTestBase::describe(string str, function_cb_t fnn, int param, const char* file)
+inline void QTestBase::describe(string str, function_cb_t fnn, int param, const char* file)
 {
 	node* new_node = new node();
 	new_node->descr = str;
@@ -672,27 +672,27 @@ void QTestBase::describe(string str, function_cb_t fnn, int param, const char* f
 	}
 }
 
-void QTestBase::before(function_cb_t fn)
+inline void QTestBase::before(function_cb_t fn)
 {
 	current->before_all.push_back(new func(fn));
 }
 
-void QTestBase::before_each(function_cb_t fn)
+inline void QTestBase::before_each(function_cb_t fn)
 {
 	current->before_each.push_back(new func(fn));
 }
 
-void QTestBase::after(function_cb_t fn)
+inline void QTestBase::after(function_cb_t fn)
 {
 	current->after_all.push_back(new func(fn));
 }
 
-void QTestBase::after_each(function_cb_t fn)
+inline void QTestBase::after_each(function_cb_t fn)
 {
 	current->after_each.push_back(new func(fn));
 }
 
-void QTestBase::it(string str, function_cb_t fn, int param)
+inline void QTestBase::it(string str, function_cb_t fn, int param)
 {
 	test* t = new test(str, fn);
 	t->only = param == QTEST_ONLY_PARAM_ID;
@@ -707,7 +707,7 @@ void QTestBase::it(string str, function_cb_t fn, int param)
 	current->tests.push_back(t);
 }
 
-void QTestBase::info_print(string str)
+inline void QTestBase::info_print(string str)
 {
 	current_test->info_prints.push_back(str);
 }
@@ -718,14 +718,14 @@ QTestExpect<T> QTestBase::expect(T a)
 	return QTestExpect<T>(a, &(current_test->result) );
 }
 
-void QTestBase::release_tree()
+inline void QTestBase::release_tree()
 {
 	release_tree(tree);
 	delete tree;
 	tree = nullptr;
 }
 
-void QTestBase::release_tree(node* n)
+inline void QTestBase::release_tree(node* n)
 {
 	if(!n)
 		return;
@@ -745,7 +745,7 @@ void QTestBase::release_tree(node* n)
 	}
 }
 
-void QTestBase::reset()
+inline void QTestBase::reset()
 {
 	release_tree();
 	tests_failed = 0;
@@ -758,7 +758,7 @@ void QTestBase::reset()
 	current = tree;
 }
 
-QTestBase::string QTestBase::generate_description(node* n)
+inline QTestBase::string QTestBase::generate_description(node* n)
 {
 	node *temp;
 	std::vector<string> descr_arr;
@@ -774,7 +774,7 @@ QTestBase::string QTestBase::generate_description(node* n)
 	return descr;
 }
 
-void QTestBase::prepare_node(node* n)
+inline void QTestBase::prepare_node(node* n)
 {
 	if(n->parent && n->parent->skip){
 		n->skip = true;
@@ -794,7 +794,7 @@ void QTestBase::prepare_node(node* n)
 	}
 }
 
-QTestBase::func_arr QTestBase::get_before_each(node* n)
+inline QTestBase::func_arr QTestBase::get_before_each(node* n)
 {
 	func_arr beforeEach;
 	node* temp = n;
@@ -810,7 +810,7 @@ QTestBase::func_arr QTestBase::get_before_each(node* n)
 	return beforeEach;
 }
 
-QTestBase::func_arr QTestBase::get_after_each(node* n)
+inline QTestBase::func_arr QTestBase::get_after_each(node* n)
 {
 	func_arr afterEach;
 	node* temp = n;
@@ -823,7 +823,7 @@ QTestBase::func_arr QTestBase::get_after_each(node* n)
 	return afterEach;
 }
 
-QTestBase::func_arr QTestBase::get_before_all(node* n)
+inline QTestBase::func_arr QTestBase::get_before_all(node* n)
 {
 	func_arr beforeAll;
 	node* temp = n;
@@ -837,44 +837,44 @@ QTestBase::func_arr QTestBase::get_before_all(node* n)
 	return beforeAll;
 }
 
-QTestBase::func_arr QTestBase::get_after_all(node* n)
+inline QTestBase::func_arr QTestBase::get_after_all(node* n)
 {
 	func_arr afterAll(n->after_all.begin(), n->after_all.end());
 	n->after_all.resize(0);
 	return afterAll;
 }
 
-void QTestBase::run_funcs(func_arr& funcs)
+inline void QTestBase::run_funcs(func_arr& funcs)
 {
 	for(auto it : funcs)
 		it->fn();
 }
 
-void QTestBase::call_before_all(node* n)
+inline void QTestBase::call_before_all(node* n)
 {
 	func_arr tests = get_before_all(n);
 	run_funcs(tests);
 }
 
-void QTestBase::call_after_all(node* n)
+inline void QTestBase::call_after_all(node* n)
 {
 	func_arr tests = get_after_all(n);
 	run_funcs(tests);
 }
 
-void QTestBase::call_before_each(node* n)
+inline void QTestBase::call_before_each(node* n)
 {
 	func_arr tests = get_before_each(n);
 	run_funcs(tests);
 }
 
-void QTestBase::call_after_each(node* n)
+inline void QTestBase::call_after_each(node* n)
 {
 	func_arr tests = get_after_each(n);
 	run_funcs(tests);
 }
 
-void QTestBase::run_tests(node* n)
+inline void QTestBase::run_tests(node* n)
 {
 	string descr = generate_description(n);
 	prepare_node(n);
@@ -910,14 +910,14 @@ void QTestBase::run_tests(node* n)
 	}
 }
 
-void QTestBase::show_failed_tests()
+inline void QTestBase::show_failed_tests()
 {
 	P->print_failure_message();
 	string str = "";
 	show_failed_tests(tree, str);
 }
 
-void QTestBase::show_failed_tests(node* n, string& str)
+inline void QTestBase::show_failed_tests(node* n, string& str)
 {
 	int str_length = str.size();
 	str += n->descr+" ";
@@ -939,7 +939,7 @@ void QTestBase::show_failed_tests(node* n, string& str)
 	str.resize(str_length);
 }
 
-void QTestBase::show_succeed()
+inline void QTestBase::show_succeed()
 {
 	P->print_succeed_message();
 }

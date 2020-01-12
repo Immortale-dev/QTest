@@ -404,6 +404,22 @@ DESCRIBE_ONLY("[Test]", {
 			EXPECT(order_list).toBeIterableEqual({1,2});
 		});
 	});
+	
+	DESCRIBE("Execution order", {
+		int ta = 1;
+		
+		IT("`ta` should be equal to 1", {
+			EXPECT(ta).toBe(1);
+		});
+		
+		DESCRIBE("overwrite `ta` with 2", {
+			ta = 2;
+			
+			IT("`ta` should be equal to 2", {
+				EXPECT(ta).toBe(2);
+			});
+		});
+	});
 }); 
 
 
