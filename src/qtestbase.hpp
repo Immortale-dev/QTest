@@ -45,6 +45,7 @@ class QTestBase
 		bool skip;
 		bool called = false;
 		bool precall = false;
+		bool tests_called = false;
 		node* parent = nullptr;
 		std::vector<node*> childs;
 		std::vector<test*> tests;
@@ -146,7 +147,7 @@ inline void QTestBase::callback()
 	}
 	
 	bool precall_tests = (!tests_only || n->precall || n->only);
-	if(!n->skip && precall_tests){
+	if(!n->skip && precall_tests && n->tests_called){
 		// if at least one test from tree path was called
 		// call current node after_all functions as we are 
 		// going to leave this node
@@ -407,6 +408,8 @@ inline void QTestBase::run_tests(node* n)
 	}
 	
 	if(n->tests.size()){
+		bool tests_called = false;
+		
 		if(!tests_only || have_callable_tests){
 			P->print_description(descr);
 		}
@@ -426,8 +429,10 @@ inline void QTestBase::run_tests(node* n)
 			if(current_test->skip)
 				tests_skipped++;
 				
-			if(!current_test->skip)
+			if(!current_test->skip){
+				tests_called = true;
 				current_test->fn();
+			}
 			
 			if(!current_test->result)
 				tests_failed++;
@@ -438,6 +443,15 @@ inline void QTestBase::run_tests(node* n)
 			
 			if(!current_test->skip){
 				call_after_each(n);
+			}
+		}
+		
+		if(tests_called){
+			// Propagate on top
+			node* tmp = n;
+			while(tmp && !tmp->tests_called){
+				tmp->tests_called = true;
+				tmp = tmp->parent;
 			}
 		}
 	}

@@ -420,6 +420,46 @@ DESCRIBE_ONLY("[Test]", {
 			});
 		});
 	});
+    
+    DESCRIBE("brefore/after run for skipped content", {
+        bool should_stay_false = false;
+        DESCRIBE("Everything skipped inside", {
+            
+            BEFORE_ALL({
+                should_stay_false = true;
+            });
+            
+            AFTER_ALL({
+                should_stay_false = true;
+            });
+            
+            BEFORE_EACH({
+                should_stay_false = true;
+            });
+            
+            AFTER_EACH({
+                should_stay_false = true;
+            });
+            
+            DESCRIBE_SKIP("Skipped content", {
+                IT("I am skipped", {
+                    TEST_FAILED();
+                });
+                
+                DESCRIBE("Also skipped content", {
+                    IT("I am skipped", {
+                        TEST_FAILED();
+                    });
+                });
+            });
+        });
+        
+        DESCRIBE("Check skippness", {
+            IT("`should_stay_false` should still be `false`", {
+                EXPECT(should_stay_false).toBe(false);
+            });
+        });
+    });
 }); 
 
 
