@@ -9,6 +9,8 @@
 
 using namespace std;
 
+SCENARIO_START
+
 DESCRIBE_ONLY("[Test]", {
     
 	DESCRIBE("Second level", {
@@ -482,5 +484,7 @@ DESCRIBE("This one is another describe that beside to DESCRIBE_ONLY rule", {
 		TEST_FAILED();
 	});
 });
+
+SCENARIO_END
 
 int main() { return 0; }

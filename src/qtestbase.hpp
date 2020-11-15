@@ -52,6 +52,9 @@ class QTestBase
 		std::vector<func*> before_all, after_all, before_each, after_each;
 	};
 	
+	public:
+		struct SCENARIO{ SCENARIO(function_cb_t fn){ fn(); } };
+	
 	
 	public:
 		QTestBase();

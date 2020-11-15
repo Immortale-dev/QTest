@@ -18,6 +18,8 @@ Just take a look for the syntax and some examples, and you may fell in love with
 	* [Syntax](#syntax)
 	* [Code scope](#code-scope)
 	* [Macros](#macros)
+		* [SCENARIO_START](#scenario_start)
+		* [SCENARIO_END](#scenario_end)
 		* [DESCRIBE](#describe-string-description-)
 		* [DESCRIBE_SKIP](#describe_skip-string-description-)
 		* [DESCRIBE_ONLY](#describe_only-string-description-)
@@ -50,6 +52,7 @@ Just take a look for the syntax and some examples, and you may fell in love with
 	* [Cycles and conditions](#cycles-and-conditions)
 	* [Expect object aliases](#expect-object-aliases)
 	* ["ONLY" rule](#only-rule)
+	* ["SCENARIO" macroses](#scenario-macroses)
 * [More](#more)
 * [License](#license)
 
@@ -81,6 +84,8 @@ We will move through all of them below.
 ```C++
 #include "qtest.hpp"
 
+SCENARIO_START
+
 DESCRIBE("[Test]", {
 	int a,b,c;
 	BEFORE_EACH({
@@ -95,10 +100,14 @@ DESCRIBE("[Test]", {
 	});
 });
 
+SCENARIO_END
+
 int main(){return 0;}
 ```
 
 Notice, we don't need to put our tests to `main()` or any else function. Because of that, it is allowed to split your tests to different files, and include them separately to your general file after including the **qtest.hpp**.
+
+Notice, before first `DESCRIBE` in each file you MUST put `SCENARIO_START` macro, and after last `DESCRIBE` you MUST put `SCENARIO_END` macro
 ***Example:***
 ```C++
 // Include framework
@@ -120,11 +129,13 @@ It is important to follow the syntax rules of building test cases:
 - And all `IT` macros *must* be called directly from `DESCRIBE` macro wrapper.
 - All `BEFORE_ALL`, `BEFORE_EACH`, `AFTER_ALL` and `AFTER_EACH` macros *must* be called directly from `DESCRIBE` macro wrapper.
 - `DESCRIBE` macros *must* be called from another `DESCRIBE` macro wrappers, or as independent from "test tree" call. 
+- All `DESCRIBE` macros should be placed between `SCENARIO_START` and `SCENARIO_END` macroses
 
 Not following those rules may cause **undefined** behavior.
 
 ***Correct examples:***
 ```C++
+SCENARIO_START
 ...
 DESCRIBE("...", {
 	int a=3,b,c;
@@ -157,6 +168,7 @@ DESCRIBE("...", {
 	});
 });
 ...
+SCENARIO_END
 ```
 
 ***Incorrect  examples:***
@@ -226,7 +238,13 @@ DESCRIBE("Some test", {
 ____
 
 ### Macros
-To build you test cases you are allowed to use the following predefined c++ macro functions:
+
+There are 2 system macroses you should use to define "borders" for all your test cases:
+
+- SCENARIO_START
+- SCENARIO_END
+
+To build your test cases you are allowed to use the following predefined c++ macro functions:
 
 - DESCRIBE
 - BEFORE_ALL
@@ -254,6 +272,35 @@ And one macro for providing additional information to the test case result:
 
 Lets move through all of them
 ____
+
+#### SCENARIO_START
+System macro you should use to define beginning of your test cases
+***Example:***
+```C++
+SCENARIO_START
+...
+DESCRIBE("...", {
+...
+```
+____
+
+#### SCENARIO_END
+System macro you should use to define ending of your test cases
+***Example:***
+```C++
+SCENARIO_START
+...
+DESCRIBE("Test", {
+...
+});
+DESCRIBE("Another Test", {
+...
+});
+...
+SCENARIO_END
+```
+____
+
 #### DESCRIBE (string description, {})
 `DESCRIBE` macro used to group some test cases, enclose the scope, split up the test cases, and provide the useful description for the group of tests, or preparation part. The description is going to be generated using current and all parent to current `DESCRIBE`'s. 
 It is receive **2** parameters: first one is the **string description** - which is the simple text description that will be used to generate the group of test overall description, and the second one is the "code scope" to be ran (see examples to get the better understanding). 
@@ -273,6 +320,8 @@ DESCRIBE("Test numbers", {
 });
 ...
 ```
+*Notice, we we didn't put `SCENARIO` macroses in the examples, but they are required in real test cases*
+
 And consider we have the `IT` macro (which is the real test definer) placed to each of the "describe", the result would be the following:
 - Test numbers
 	- Test case 1
@@ -776,6 +825,12 @@ ____
 
 ### "ONLY" rule
 If you are going to use `DESCRIBE_ONLY` or `IT_ONLY` macros, don't forget to put `#define TEST_ONLY_RULE` before the `#include "qtest.hpp"`
+
+____
+
+### "SCENARIO" macroses
+Due to recent changes in C++ (2 y.o. actually, lol) it is not permitted anymore to use default-capture lambda functions in non-local scope, so I had to define additional macroses to make everything works again.
+Now, you MUST put all your `DESCIBE` macros between `SCENARIO_START` and `SCENARIO_END` macroses.
 
 ## More
 
