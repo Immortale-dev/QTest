@@ -107,16 +107,18 @@ int main(){return 0;}
 
 Notice, we don't need to put our tests to `main()` or any else function. Because of that, it is allowed to split your tests to different files, and include them separately to your general file after including the **qtest.hpp**.
 
-Notice, before first `DESCRIBE` in each file you MUST put `SCENARIO_START` macro, and after last `DESCRIBE` you MUST put `SCENARIO_END` macro
+Notice, before first `DESCRIBE` you MUST put `SCENARIO_START` macro, and after last `DESCRIBE` you MUST put `SCENARIO_END` macro
 ***Example:***
 ```C++
 // Include framework
 #include "qtest.hpp"
 
+SCENARIO_START
 // Include testing files
 #include "testAriphmethics.cpp"
 #include "testMyProgramCode.cpp"
 #include "testAnotherOneThing.cpp"
+SCENARIO_END
 
 int main(){return 0;}
 ```
@@ -130,6 +132,7 @@ It is important to follow the syntax rules of building test cases:
 - All `BEFORE_ALL`, `BEFORE_EACH`, `AFTER_ALL` and `AFTER_EACH` macros *must* be called directly from `DESCRIBE` macro wrapper.
 - `DESCRIBE` macros *must* be called from another `DESCRIBE` macro wrappers, or as independent from "test tree" call. 
 - All `DESCRIBE` macros should be placed between `SCENARIO_START` and `SCENARIO_END` macroses
+- There should be exactly one `SCENARIO_START` and one `SCENARIO_END` macroses
 
 Not following those rules may cause **undefined** behavior.
 
