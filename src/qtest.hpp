@@ -20,8 +20,8 @@
 #define INFO_PRINT(a) QTESTOBJECTDEFINED.info_print(a)
 #define TEST_FAILED() EXPECT(1).toBe(0)
 #define TEST_SUCCEED() EXPECT(1).toBe(1)
-#define SCENARIO_START QTestBase::SCENARIO Q_TEST__UNIQ_NAME()([]{
-#define SCENARIO_END });
+#define SCENARIO_START Q_TEST__TEST_UNIT (QTEST_SCENARIO_SIGN, []{
+#define SCENARIO_END }, QTEST_TEST_PARAM_ID, __FILE__);
 
 
 // Initialize file local helpers

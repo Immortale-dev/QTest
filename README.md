@@ -67,7 +67,7 @@ This script will build the **test.cpp** program, run it, and clear working direc
 ## Dist
 
 Additionally we've generated single **.hpp** file you can use to include full testing framework functionality. 
-You can find this file placed to **/dist** folder. It is lightweight - less that **25kb** totally. 
+You can find this file placed to **/dist** folder. It is lightweight - less than **25kb** totally. 
 
 
 ## Docs 
@@ -107,7 +107,8 @@ int main(){return 0;}
 
 Notice, we don't need to put our tests to `main()` or any else function. Because of that, it is allowed to split your tests to different files, and include them separately to your general file after including the **qtest.hpp**.
 
-Notice, before first `DESCRIBE` you MUST put `SCENARIO_START` macro, and after last `DESCRIBE` you MUST put `SCENARIO_END` macro
+Notice, you must put every your `DESCRIBE` macro between one one `SCENARIO_START` / `SCENARIO_END`. It is not required to have exactly one scenario, you could have multiple, and you could put multiple scenarios to each your test file.
+
 ***Example:***
 ```C++
 // Include framework
@@ -132,7 +133,6 @@ It is important to follow the syntax rules of building test cases:
 - All `BEFORE_ALL`, `BEFORE_EACH`, `AFTER_ALL` and `AFTER_EACH` macros *must* be called directly from `DESCRIBE` macro wrapper.
 - `DESCRIBE` macros *must* be called from another `DESCRIBE` macro wrappers, or as independent from "test tree" call. 
 - All `DESCRIBE` macros should be placed between `SCENARIO_START` and `SCENARIO_END` macroses
-- There should be exactly one `SCENARIO_START` and one `SCENARIO_END` macroses
 
 Not following those rules may cause **undefined** behavior.
 
@@ -214,6 +214,7 @@ as actually call of lambda function with reference variables rule
 [&](){ /* More code here */ });
 ```
 And you can rely on such **lambda** functionality behavior.
+
 ***Example:***
 
 ```C++
@@ -278,6 +279,7 @@ ____
 
 #### SCENARIO_START
 System macro you should use to define beginning of your test cases
+
 ***Example:***
 ```C++
 SCENARIO_START
@@ -289,6 +291,7 @@ ____
 
 #### SCENARIO_END
 System macro you should use to define ending of your test cases
+
 ***Example:***
 ```C++
 SCENARIO_START
@@ -323,7 +326,7 @@ DESCRIBE("Test numbers", {
 });
 ...
 ```
-*Notice, we we didn't put `SCENARIO` macroses in the examples, but they are required in real test cases*
+*Notice, we didn't put `SCENARIO` macroses in the examples, but they are required in real test cases*
 
 And consider we have the `IT` macro (which is the real test definer) placed to each of the "describe", the result would be the following:
 - Test numbers
@@ -357,6 +360,7 @@ This macro also used for the debugging purposes, when you want to focus on one o
 But unlike the `DESCRIBE_SKIP`, tests that was "filtered" by `DESCRIBE_ONLY` rule will not be showed in the test results.
 
 ***Important:*** this macro will work as expected only if additionally `TEST_ONLY_RULE` variable is defined before the `#include "qtest.hpp"`. Otherwise it will work as a simple `DESCRIBE` rule.
+
 ***Example:***
 ```C++
 ...
@@ -385,6 +389,7 @@ DESCRIBE("...", {
 ____
 #### BEFORE_ALL ({})
 This macro requires only the **code scope** to be passed as a first parameter. The code inside the brackets will be called only once, before the first test from the `DESCRIBE` where this `BEFORE_ALL` placed is executed. Usually this rule is used to initialize the variables needed for the test cases.
+
 ***Example:***
 ```C++
 ...
@@ -408,6 +413,7 @@ ____
 
 #### AFTER_ALL ({})
 This macro requires only the **code scope** to be passed as the first parameter. The code inside the brackets will be called only once, after the final test case of the `DESCRIBE` where this `AFTER_ALL` placed is executed. Usually this rule is used to release the memory assumed by the test cases.
+
 ***Example:***
 ```C++
 DESCRIBE("Test step array values", {
@@ -429,6 +435,7 @@ ____
 
 #### BEFORE_EACH ({})
 This macro requires only the **code scope** to be passed as the first parameter. The code inside the brackets will be called before **every** test case of the `DESCRIBE` where this `BEFORE_EACH` placed to, and all of this children `DESCRIBE`'s test cases. Usually this rule used to make some variable preparations that needs to be similar before each test case.
+
 ***Example:***
 ```C++
 DESCRIBE("Test std::set", {
@@ -462,6 +469,7 @@ ____
 
 #### AFTER_EACH ({})
 This macro requires only the **code scope** to be passed as the first parameter. The code inside the brackets will be called after **every** test case of the `DESCRIBE` where this `AFTER_EACH` placed to, and all of this children `DESCRIBE`'s test cases. Usually this rule used to make some variable release memory after each test case, or clear mutable changes.
+
 ***Example:***
 ```C++
 DESCRIBE("Test std::set", {
@@ -483,6 +491,7 @@ ____
 
 #### IT (string description, {})
 This macro is used to define the actual test case. First parameter requires **string description** that represents the description of the test case that will be showed in test results, and the second parameter is a **code scope** of current test. You can define as many additional variables as you need inside the test code scope to execute the actual test.  
+
 ***Example:***
 ```C++
 ...
@@ -521,6 +530,7 @@ ____
 This macro used to resolve the test case. It is required one parameter to be passed. You can send any **value** type you want, this macro will return **QTestExpect** class instance, which has different methods to proceed with. You can find all available methods in [QTestExpect class](#qtestexpect-t-actual) section.
 
 You can use as many `EXPECT` calls as you need for every separate test case.
+
 ***Exapmle:***
 ```C++
 ...
@@ -534,6 +544,7 @@ ____
 
 #### TEST_SUCCEED ()
 This macro requires no parameters to be passed, and used only inside the `IT` macro **code scope** and will **succeed** the test case it is used for. This macro equivalent to `EXPECT(1).toBe(1)` .
+
 ***Example:***
 ```C++
 ...
@@ -546,6 +557,7 @@ ____
 
 #### TEST_FAILED ()
 This macro requires no parameters to be passed, and used only inside the `IT` macro **code scope** and will **fail** the test case it is used for. This macro equivalent to `EXPECT(1).toBe(0)` .
+
 ***Example:***
 ```C++
 ...
@@ -558,6 +570,7 @@ ____
 
 #### INFO_PRINT (string str)
 This macro requires one parameter to be passed **string str** and used to provide additional information to the test case. Used only inside the `IT` macro **code scope** and will print the text you pass after the test case result.
+
 ***Example:***
 ```C++
 ...
@@ -619,6 +632,7 @@ ____
 
 #### toBeCloseTo (double compare, double precision)
 Method used to compare actual value to be within a specified precision of the expected value. It is requires 2 **double** parameters to be passed: the `compare` and `precision`. This method will succeed the test if actual value lies within the [`compare - precision` , `compare + precision`] range.
+
 ***Example:***
 ```C++
 ...
@@ -633,6 +647,7 @@ ____
 
 #### toBeGreaterThan (T compare)
 Method will succeed test if the actual value is *greater than* the expected value. Requires one parameter to be passed with **the same type** as actual value you put to `EXPECT` macro.
+
 ***Example:***
 ```C++
 ...
@@ -644,6 +659,7 @@ ____
 
 #### toBeGreaterThanOrEqual (T compare)
 Method will succeed test if the actual value is *greater than or equal* to the expected value. Requires one parameter to be passed with **the same type** as actual value you put to `EXPECT` macro.
+
 ***Example:***
 ```C++
 ...
@@ -655,6 +671,7 @@ ____
 
 #### toBeLessThan (T compare)
 Method will succeed test if the actual value is *less than* the expected value. Requires one parameter to be passed with **the same type** as actual value you put to `EXPECT` macro.
+
 ***Example:***
 ```C++
 ...
@@ -666,6 +683,7 @@ ____
 
 #### toBeLessThanOrEqual (T compare)
 Method will succeed test if the actual value is *less than or equal* to the expected value. Requires one parameter to be passed with **the same type** as actual value you put to `EXPECT` macro.
+
 ***Example:***
 ```C++
 ...
@@ -677,6 +695,7 @@ ____
 
 #### toBeNull ()
 Method will succeed test of the actual value is equal to `NULL`. No parameters required.
+
 ***Example:***
 ```C++
 ...
@@ -689,6 +708,7 @@ ____
 
 #### toBeNullPtr ()
 Method will succeed test of the actual value is equal to `nullptr`. No parameters required.
+
 ***Example:***
 ```C++
 ...
@@ -701,7 +721,9 @@ ____
 
 #### toBeIterableEqual (CT compare)
 Method used to compare your **iterable** object with the list of items (or another iterable object). It is requires one parameter to be passed to compare with. 
+
 ***Important:*** Iterable objects - the objects that have predefined methods such as `begin` and `end` that returns [Iterator object](https://en.wikipedia.org/wiki/Iterator)
+
 ***Example:***
 ```C++
 ...
@@ -725,6 +747,7 @@ ____
 
 #### toThrowError ()
 This method requires the **function** to be passed to `EXPECT` macro. When called, it will succeed the test case, if the function passed to `EXPECT` is going to throw an error.
+
 ***Example:***
 ```C++
 EXPECT([](){ throw "error here"; }).toThrowError();
@@ -734,6 +757,7 @@ ____
 
 #### toReturnTrue ()
 This method requires the **function** to be passed to `EXPECT` macro. When called, it will succeed the test case, if the function passed to `EXPECT` is going to return `true`.
+
 ***Example:***
 ```C++
 EXPECT([]() -> bool { return 1; }).toReturnTrue();
@@ -743,6 +767,7 @@ ____
 
 #### NOT ()
 This method does not requires any parameters to be passed, and will return another `QTestExpect` class instance, but with reversed results of methods. See examples to get better understanding.
+
 ***Example:***
 ```C++
 EXPECT(42).NOT().toBe(72) 
@@ -779,6 +804,7 @@ ____
 
 ### Cycles and conditions
 You are **not allowed** to use cycles for tests definitions.
+
 ***Example:***
 ```C++
 ...
@@ -802,6 +828,7 @@ DESCRIBE("Test `calc` method", {
 It will not work as you **MUST** call `IT` directly from `DESCRIBE` macro block scope. Same with `DESCRIBE` macros.
 
 But it is allowed to use cycles and conditions inside the `IT` macro.
+
 ***Example:***
 ```C++
 ...
@@ -816,6 +843,7 @@ ____
 
 ### Expect object aliases
 Each of the `QTestExpect` class instance methods (except `NOT`) has aliases in **snake case** format (small characters delimited with underscore `_` character). 
+
 ***Example:*** 
 ```C++
 ...

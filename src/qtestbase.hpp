@@ -53,14 +53,6 @@ class QTestBase
 	};
 	
 	public:
-		struct SCENARIO{ 
-			function_cb_t fn;
-			SCENARIO(function_cb_t fn) : fn(fn) {}
-			~SCENARIO(){ fn(); }
-		};
-	
-	
-	public:
 		QTestBase();
 		~QTestBase();
 		
