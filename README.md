@@ -569,7 +569,8 @@ IT("Should fail", {
 ____
 
 #### INFO_PRINT (string str)
-This macro requires one parameter to be passed **string str** and used to provide additional information to the test case. Used only inside the `IT` macro **code scope** and will print the text you pass after the test case result.
+This macro accepts one optional parameter to be passed **string str** and used to provide additional information to the test case. Used only inside the `IT` macro **code scope** and will print the text you pass after the test case result.
+It also returns a std::basic_ostream object, so you can use `<<` operator to continue putting some more info to the info log.
 
 ***Example:***
 ```C++
@@ -577,7 +578,7 @@ This macro requires one parameter to be passed **string str** and used to provid
 IT("Additional info", {
 	if(stars_lined_up){
 		TEST_SUCCEED();
-		INFO_PRINT("Stars Lined Up");
+		INFO_PRINT("Stars Lined Up") << " don't forget to take a photo!";
 	}
 });
 ...

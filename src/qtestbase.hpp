@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <sstream>
 #include "qtestexpect.hpp"
 #include "qtestprint.hpp"
 #include "qtestutils.hpp"
@@ -19,7 +20,7 @@ class QTestBase
 	using function_cb_t = std::function<void()>;
 	using string = std::string;
 	using func_arr = std::vector<func*>;
-	using info_prints_t = std::vector<string>;
+	using info_prints_t = std::vector<std::stringstream>;
 	
 	struct func
 	{
@@ -63,7 +64,7 @@ class QTestBase
 		void after_each(function_cb_t fn);
 		void it(string str, function_cb_t fn, int param);
 		void callback();
-		void info_print(string str);
+		std::basic_ostream<char>& info_print(string str = "");
 		template<typename T>
 		QTestExpect<T> expect(T a);
 		
@@ -215,9 +216,10 @@ inline void QTestBase::it(string str, function_cb_t fn, int param)
 	current->tests.push_back(t);
 }
 
-inline void QTestBase::info_print(string str)
+inline std::basic_ostream<char>& QTestBase::info_print(string str)
 {
-	current_test->info_prints.push_back(str);
+	current_test->info_prints.push_back(std::stringstream{});
+	return current_test->info_prints.back() << str;
 }
 
 template<typename T>

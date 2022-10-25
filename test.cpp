@@ -478,6 +478,7 @@ DESCRIBE("This one is another describe that beside to DESCRIBE_ONLY rule", {
 	IT_ONLY("should be visible as IT_ONLY rule applied", {
 		TEST_SUCCEED();
 		INFO_PRINT("some additional info");
+		INFO_PRINT() << "another " << 123 << " info";
 	});
 	
 	IT("should not be visible eaither", {

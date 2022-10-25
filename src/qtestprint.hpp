@@ -14,11 +14,12 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <sstream>
 
 class QTestPrint
 {
 	using string = std::string;
-	using test_infos = std::vector<string>;
+	using test_infos = std::vector<std::stringstream>;
 	
 	public:
 		QTestPrint();
@@ -123,7 +124,8 @@ inline void QTestPrint::print_test_info(test_infos& arr)
 	for(auto& it : arr){
 		print("        ");
 		print(" - ");
-		print_grey(it);
+		string s(std::istreambuf_iterator<char>(it), {});
+		print_grey(s);
 		print(newline);
 	}
 }
