@@ -1,4 +1,4 @@
-/** v1.2.1 */
+/** v1.2.2 */
 
 #ifndef QTEST_H
 #define QTEST_H
@@ -84,28 +84,27 @@ class QTestExpect
 		void toThrowError();
 		void toReturnTrue();
 		QTestExpect<T> NOT();
-		void to_be(T compare){ return toBe(compare); };
-		void to_be_close_to( double compare, double precision){ return toBeCloseTo(compare, precision); };
-		void to_be_greater_than(T compare){ return toBeGreaterThan(compare); };
-		void to_be_greater_than_or_equal(T compare){ return toBeGreaterThanOrEqual(compare); };
-		void to_be_less_than(T compare){ return toBeLessThan(compare); };
-		void to_be_less_than_or_equal(T compare){ return toBeLessThanOrEqual(compare); };
-		void to_be_null(){ return toBeNull(); };
-		void to_be_null_ptr(){ return toBeNullPtr(); };
+		void to_be(T compare){ return toBe(compare); }
+		void to_be_close_to( double compare, double precision){ return toBeCloseTo(compare, precision); }
+		void to_be_greater_than(T compare){ return toBeGreaterThan(compare); }
+		void to_be_greater_than_or_equal(T compare){ return toBeGreaterThanOrEqual(compare); }
+		void to_be_less_than(T compare){ return toBeLessThan(compare); }
+		void to_be_less_than_or_equal(T compare){ return toBeLessThanOrEqual(compare); }
+		void to_be_null(){ return toBeNull(); }
+		void to_be_null_ptr(){ return toBeNullPtr(); }
 		template<typename CT>
-		void to_be_iterable_equal(CT compare){ return toBeIterableEqual(compare); };
+		void to_be_iterable_equal(CT compare){ return toBeIterableEqual(compare); }
 		template<typename CT>
-		void to_be_iterable_equal(std::initializer_list<CT> list){ return toBeIterableEqual(list); };
-		void to_throw_error(){ return toThrowError(); };
-		void to_return_true(){ return toReturnTrue(); };
-		
+		void to_be_iterable_equal(std::initializer_list<CT> list){ return toBeIterableEqual(list); }
+		void to_throw_error(){ return toThrowError(); }
+		void to_return_true(){ return toReturnTrue(); }
+
 	private:
 		T val;
 		bool* result;
 		bool inv = false;
 		bool proceed_result(bool result);
 };
-
 
 template<typename T>
 void QTestExpect<T>::toBe(T compare)
@@ -206,8 +205,7 @@ QTestExpect<T> QTestExpect<T>::NOT()
 template<typename T>
 bool QTestExpect<T>::proceed_result(bool result)
 {
-	if(inv) 
-		return !result;
+	if(inv) return !result;
 	return result;
 }
 
@@ -216,6 +214,7 @@ class QTestPrint
 {
 	using string = std::string;
 	using test_infos = std::vector<std::stringstream>;
+
 	public:
 		QTestPrint();
 		void print_description(string& str);
@@ -238,7 +237,7 @@ class QTestPrint
 		void print_skip_sign();
 		void print_succeed_message();
 		void print_failure_message();
-		
+
 	private:
 		#ifdef _WIN32
 		HANDLE hConsole;
@@ -508,19 +507,19 @@ inline void QTestPrint::set_color(Color c)
 		string color;
 		switch(c){
 			case Color::Success:
-				color = "\e[32m";
+				color = "\033[32m";
 				break;
 			case Color::Error:
-				color = "\e[31m";
+				color = "\033[31m";
 				break;
 			case Color::Neutral:
-				color = "\e[96m";
+				color = "\033[96m";
 				break;
 			case Color::Grey:
-				color = "\e[37m";
+				color = "\033[37m";
 				break;
 			default:
-				color = "\e[39m";
+				color = "\033[39m";
 		}
 		print(color);
 	#endif
@@ -576,7 +575,7 @@ class QTestBase
 		std::vector<test*> tests;
 		std::vector<func*> before_all, after_all, before_each, after_each;
 	};
-	
+
 	public:
 		QTestBase();
 		~QTestBase();
@@ -590,7 +589,7 @@ class QTestBase
 		std::basic_ostream<char>& info_print(string str = "");
 		template<typename T>
 		QTestExpect<T> expect(T a);
-		
+
 	private:
 		node* tree = nullptr;
 		node* current = nullptr;
@@ -620,7 +619,6 @@ class QTestBase
 		void reset();
 };
 
-
 inline QTestBase::QTestBase()
 {
 	reset();
@@ -647,8 +645,7 @@ inline QTestBase::~QTestBase()
 
 inline void QTestBase::callback()
 {
-	if(current->called)
-		return;
+	if(current->called) return;
 	node* n = current;
 	run_tests(n);
 	n->called = true;
@@ -658,6 +655,9 @@ inline void QTestBase::callback()
 	}
 	bool precall_tests = (!tests_only || n->precall || n->only);
 	if(!n->skip && precall_tests && n->tests_called){
+		// if at least one test from tree path was called
+		// call current node after_all functions as we are 
+		// going to leave this node
 		call_after_all(n);
 	}
 }
@@ -787,17 +787,21 @@ inline QTestBase::string QTestBase::generate_description(node* n)
 inline void QTestBase::prepare_node(node* n)
 {
 	if(n->parent && n->parent->skip){
+		// inherit skip from parent
 		n->skip = true;
 	}
 	if(n->parent && n->parent->only){
+		// inherit only from parent
 		n->only = true;
 	}
 	if(n->only){
+		// mark all tests as only
 		for(auto it : n->tests){
 			it->only = true;
 		}
 	}
 	if(n->skip){
+		// mark all tests as skip
 		for(auto it : n->tests){
 			it->skip = true;
 		}
@@ -973,4 +977,5 @@ namespace{
 	};
 	Q_TEST__CALLBACK();
 }
+
 #endif // QTEST_H

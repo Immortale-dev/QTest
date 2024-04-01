@@ -20,7 +20,7 @@ class QTestPrint
 {
 	using string = std::string;
 	using test_infos = std::vector<std::stringstream>;
-	
+
 	public:
 		QTestPrint();
 		void print_description(string& str);
@@ -43,16 +43,16 @@ class QTestPrint
 		void print_skip_sign();
 		void print_succeed_message();
 		void print_failure_message();
-		
+
 	private:
 		#ifdef _WIN32
 		HANDLE hConsole;
 		DWORD def_bgcolor, def_color;
 		#endif
 		int line_length = 60;
-		
+
 		enum class Color{Success, Error, Neutral, Grey, Default};
-		
+
 		const string newline = "\n";
 		const string tab = "    ";
 		const string delim_txt = "*";
@@ -64,7 +64,7 @@ class QTestPrint
 		const string succ_sign = "[/]";
 		const string fail_sign = "[x]";
 		const string skip_sign = "[-]";
-		
+
 		string create_titled_message(string str);
 		string toupper(string txt);
 		void processConsoleWindow();
@@ -99,7 +99,7 @@ inline void QTestPrint::print_description_extended(string& str, string& file)
 inline void QTestPrint::print_test(string& str, bool good, bool skipped)
 {
 	print("    ");
-	
+
 	if(skipped){
 		print_skip_sign();
 	}
@@ -109,13 +109,13 @@ inline void QTestPrint::print_test(string& str, bool good, bool skipped)
 	else{
 		print_error_sign();
 	}
-		
+
 	print(" ");
 	good ? print_grey(str) : print_error(str);
-	
+
 	if(skipped)
 		print_neutral(" ("+skipped_txt+")");
-	
+
 	print(newline);
 }
 
@@ -159,19 +159,19 @@ inline void QTestPrint::print_statistics(int tests_count, int tests_failed, int 
 	print(newline);
 	print_title(toupper(statistics_txt));
 	print(newline);
-	
+
 	print_success_sign();
 	print_grey(" "+toupper(succeed_txt)+": ");
 	print(std::to_string(tests_count-tests_failed-tests_skipped));
 	print(newline);
-	
+
 	if(tests_skipped){
 		print_skip_sign();
 		print_grey(" "+toupper(skipped_txt)+": ");
 		print(std::to_string(tests_skipped));
 		print(newline);
 	}
-	
+
 	if(tests_failed){
 		print_error_sign();
 		print_grey(" "+toupper(failed_txt)+": ");
@@ -324,19 +324,19 @@ inline void QTestPrint::set_color(Color c)
 		string color;
 		switch(c){
 			case Color::Success:
-				color = "\e[32m";
+				color = "\033[32m";
 				break;
 			case Color::Error:
-				color = "\e[31m";
+				color = "\033[31m";
 				break;
 			case Color::Neutral:
-				color = "\e[96m";
+				color = "\033[96m";
 				break;
 			case Color::Grey:
-				color = "\e[37m";
+				color = "\033[37m";
 				break;
 			default:
-				color = "\e[39m";
+				color = "\033[39m";
 		}
 		print(color);
 	#endif

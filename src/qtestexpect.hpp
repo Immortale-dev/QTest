@@ -25,23 +25,23 @@ class QTestExpect
 		void toThrowError();
 		void toReturnTrue();
 		QTestExpect<T> NOT();
-		
+
 		//Aliases
-		void to_be(T compare){ return toBe(compare); };
-		void to_be_close_to( double compare, double precision){ return toBeCloseTo(compare, precision); };
-		void to_be_greater_than(T compare){ return toBeGreaterThan(compare); };
-		void to_be_greater_than_or_equal(T compare){ return toBeGreaterThanOrEqual(compare); };
-		void to_be_less_than(T compare){ return toBeLessThan(compare); };
-		void to_be_less_than_or_equal(T compare){ return toBeLessThanOrEqual(compare); };
-		void to_be_null(){ return toBeNull(); };
-		void to_be_null_ptr(){ return toBeNullPtr(); };
+		void to_be(T compare){ return toBe(compare); }
+		void to_be_close_to( double compare, double precision){ return toBeCloseTo(compare, precision); }
+		void to_be_greater_than(T compare){ return toBeGreaterThan(compare); }
+		void to_be_greater_than_or_equal(T compare){ return toBeGreaterThanOrEqual(compare); }
+		void to_be_less_than(T compare){ return toBeLessThan(compare); }
+		void to_be_less_than_or_equal(T compare){ return toBeLessThanOrEqual(compare); }
+		void to_be_null(){ return toBeNull(); }
+		void to_be_null_ptr(){ return toBeNullPtr(); }
 		template<typename CT>
-		void to_be_iterable_equal(CT compare){ return toBeIterableEqual(compare); };
+		void to_be_iterable_equal(CT compare){ return toBeIterableEqual(compare); }
 		template<typename CT>
-		void to_be_iterable_equal(std::initializer_list<CT> list){ return toBeIterableEqual(list); };
-		void to_throw_error(){ return toThrowError(); };
-		void to_return_true(){ return toReturnTrue(); };
-		
+		void to_be_iterable_equal(std::initializer_list<CT> list){ return toBeIterableEqual(list); }
+		void to_throw_error(){ return toThrowError(); }
+		void to_return_true(){ return toReturnTrue(); }
+
 	private:
 		T val;
 		bool* result;
@@ -150,8 +150,7 @@ QTestExpect<T> QTestExpect<T>::NOT()
 template<typename T>
 bool QTestExpect<T>::proceed_result(bool result)
 {
-	if(inv) 
-		return !result;
+	if(inv) return !result;
 	return result;
 }
 

@@ -1,7 +1,6 @@
 #ifndef QTEST_H
 #define QTEST_H
 
-
 #include <functional>
 #include "qtestbase.hpp"
 #include "qtestutils.hpp"
@@ -39,44 +38,44 @@ namespace{
 
 
 /** ***********************USAGE****************************
- * 
- * 
+ *
+ *
  * DESCRIBE("...",{
- * 
+ *
  *     auto a = ...
- * 
+ *
  *     BEFOREALL({ ... });
  *     BEFOREEACH({ ... });
- * 
+ *
  *     DESCRIBE("...", {
- * 
+ *
  *         int b = ...
- * 
+ *
  *         BEFOREALL({ ... });
  *         BEFOREEACH({ ... });
- * 
- *         IT("...", { 
- *         
+ *
+ *         IT("...", {
+ *
  *             ...
- *             EXPECT(expression).[...] /// toBe | ... 
- * 
+ *             EXPECT(expression).[...] /// toBe | ...
+ *
  *         });
- * 
- *         AFTEREACH({ ... });	
+ *
+ *         AFTEREACH({ ... });
  *         AFTERALL({...});
- * 
+ *
  *     });
- * 
+ *
  *     DESCRIBE(...);
- * 
+ *
  *     DESCRIBE(...);
- * 
+ *
  *     DESCRIBE(...);
- * 
- *     AFTEREACH({ ... });	
+ *
+ *     AFTEREACH({ ... });
  *     AFTERALL({...});
  * });
- * 
+ *
  * ***********************************************************/
 
 #endif // QTEST_H

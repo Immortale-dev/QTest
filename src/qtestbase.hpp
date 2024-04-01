@@ -16,12 +16,12 @@ class QTestBase
 	struct func;
 	struct test;
 	struct node;
-	
+
 	using function_cb_t = std::function<void()>;
 	using string = std::string;
 	using func_arr = std::vector<func*>;
 	using info_prints_t = std::vector<std::stringstream>;
-	
+
 	struct func
 	{
 		function_cb_t fn;
@@ -52,11 +52,11 @@ class QTestBase
 		std::vector<test*> tests;
 		std::vector<func*> before_all, after_all, before_each, after_each;
 	};
-	
+
 	public:
 		QTestBase();
 		~QTestBase();
-		
+
 		void describe(string str, function_cb_t fnn, int param, const char* file);
 		void before(function_cb_t fn);
 		void before_each(function_cb_t fn);
@@ -67,40 +67,40 @@ class QTestBase
 		std::basic_ostream<char>& info_print(string str = "");
 		template<typename T>
 		QTestExpect<T> expect(T a);
-		
+
 	private:
 		node* tree = nullptr;
 		node* current = nullptr;
 		test* current_test = nullptr;
-		
+
 		QTestPrint* P;
-		
+
 		int tests_count = 0;
 		int tests_failed = 0;
 		int tests_skipped = 0;
 		bool tests_only = false;
-		
+
 		string generate_description(node* n);
-		
+
 		func_arr get_before_each(node* n);
 		func_arr get_after_each(node* n);
 		func_arr get_before_all(node* n);
 		func_arr get_after_all(node* n);
-		
+
 		void run_funcs(func_arr& funcs);
-		
+
 		void call_before_all(node* n);
 		void call_after_all(node* n);
 		void call_before_each(node* n);
 		void call_after_each(node* n);
-		
+
 		void prepare_node(node* n);
 		void run_tests(node *n);
-		
+
 		void show_failed_tests();
 		void show_failed_tests(node* n, string& str);
 		void show_succeed();
-		
+
 		void release_tree();
 		void release_tree(node* n);
 		void reset();
@@ -111,7 +111,7 @@ inline QTestBase::QTestBase()
 {
 	reset();
 	P = new QTestPrint();
-	
+
 	P->print_start();
 }
 
@@ -134,18 +134,17 @@ inline QTestBase::~QTestBase()
 
 inline void QTestBase::callback()
 {
-	if(current->called)
-		return;
-		
+	if(current->called) return;
+
 	node* n = current;
 	run_tests(n);
 	n->called = true;
-	
+
 	for(auto it : n->childs){
 		current = it;
 		current->fn();
 	}
-	
+
 	bool precall_tests = (!tests_only || n->precall || n->only);
 	if(!n->skip && precall_tests && n->tests_called){
 		// if at least one test from tree path was called
@@ -158,7 +157,7 @@ inline void QTestBase::callback()
 inline void QTestBase::describe(string str, function_cb_t fnn, int param, const char* file)
 {
 	node* new_node = new node();
-	
+
 	new_node->descr = str;
 	new_node->only = param == QTEST_ONLY_PARAM_ID;
 	new_node->skip = param == QTEST_SKIP_PARAM_ID;
@@ -166,7 +165,7 @@ inline void QTestBase::describe(string str, function_cb_t fnn, int param, const 
 	new_node->fn = fnn;
 	new_node->file = file;
 	current->childs.push_back(new_node);
-	
+
 	if(new_node->only){
 		// mark all parents with precall = true
 		node* tmp = new_node;
@@ -174,8 +173,8 @@ inline void QTestBase::describe(string str, function_cb_t fnn, int param, const 
 			tmp->precall = true;
 			tmp = tmp->parent;
 		}
-	} 
-	
+	}
+
 }
 
 inline void QTestBase::before(function_cb_t fn)
@@ -203,7 +202,7 @@ inline void QTestBase::it(string str, function_cb_t fn, int param)
 	test* t = new test(str, fn);
 	t->only = param == QTEST_ONLY_PARAM_ID;
 	t->skip = param == QTEST_SKIP_PARAM_ID;
-	
+
 	if(t->only){
 		// mark all parents with precall = true
 		node* tmp = current;
@@ -212,7 +211,7 @@ inline void QTestBase::it(string str, function_cb_t fn, int param)
 			tmp = tmp->parent;
 		}
 	}
-	
+
 	current->tests.push_back(t);
 }
 
@@ -261,11 +260,11 @@ inline void QTestBase::reset()
 	tests_failed = 0;
 	tests_count = 0;
 	tests_skipped = 0;
-	
+
 	#ifdef TEST_ONLY_RULE
 	tests_only = true;
 	#endif
-	
+
 	tree = new node();
 	current = tree;
 }
@@ -292,19 +291,19 @@ inline void QTestBase::prepare_node(node* n)
 		// inherit skip from parent
 		n->skip = true;
 	}
-	
+
 	if(n->parent && n->parent->only){
 		// inherit only from parent
 		n->only = true;
 	}
-	
+
 	if(n->only){
 		// mark all tests as only
 		for(auto it : n->tests){
 			it->only = true;
 		}
 	}
-	
+
 	if(n->skip){
 		// mark all tests as skip
 		for(auto it : n->tests){
@@ -396,57 +395,57 @@ inline void QTestBase::call_after_each(node* n)
 inline void QTestBase::run_tests(node* n)
 {
 	string descr = generate_description(n);
-	
+
 	// inherit parent rules
 	prepare_node(n);
-	
+
 	bool have_callable_tests = false;
-	
+
 	// check for any test to be executed in scope of this node
 	for(auto it : n->tests){
 		if(it->only)
 			have_callable_tests = true;
 	}
-	
+
 	if(n->tests.size()){
 		bool tests_called = false;
-		
+
 		if(!tests_only || have_callable_tests){
 			P->print_description(descr);
 		}
-		
+
 		for(auto it : n->tests){
 			current_test = it;
-			
+
 			// Check for current test to be called
 			if(tests_only && !current_test->only)
 				continue;
-				
+
 			if(!current_test->skip){
 				call_before_each(n);
 			}
-			
+
 			tests_count++;
 			if(current_test->skip)
 				tests_skipped++;
-				
+
 			if(!current_test->skip){
 				tests_called = true;
 				current_test->fn();
 			}
-			
+
 			if(!current_test->result)
 				tests_failed++;
 
 			// Print test
 			P->print_test(current_test->descr, current_test->result, current_test->skip);
 			P->print_test_info(current_test->info_prints);
-			
+
 			if(!current_test->skip){
 				call_after_each(n);
 			}
 		}
-		
+
 		if(tests_called){
 			// Propagate on top
 			node* tmp = n;

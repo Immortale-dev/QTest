@@ -12,41 +12,41 @@ using namespace std;
 SCENARIO_START
 
 DESCRIBE_ONLY("[Test]", {
-    
+
 	DESCRIBE("Second level", {
 		IT("should succeed as TEST_SUCCEED method used", {
 			TEST_SUCCEED();
 		});
-		
+
 		IT("should fail as TEST_FAILED method used", {
 			TEST_FAILED();
 		});
 	});
-	
+
 	DESCRIBE("Variables", {
 		DESCRIBE("Int type variable", {
 			int inc = 2;
-			
+
 			DESCRIBE("With before_each increment function", {
 				int inc = 0;
-				
+
 				BEFORE_EACH({
-					inc++;			
+					inc++;
 				});
-				
+
 				IT("First test - inc variable should be equals to 1", {
 					EXPECT(inc).toBe(1);
 				});
-				
+
 				IT("Second test - inc variable should be equals to 2", {
 					EXPECT(inc).toBe(2);
 				});
-				
+
 				IT("Third test - inc variable should be equals to 3", {
 					EXPECT(inc).toBe(3);
 				});
 			});
-			
+
 			DESCRIBE("Sum of variables", {
 				int a,b,c;
 				BEFORE_EACH({
@@ -60,136 +60,136 @@ DESCRIBE_ONLY("[Test]", {
 					});
 				});
 			});
-			
+
 			DESCRIBE("And check variables scope", {
 				IT("inc variable should be equals to 2 here", {
 					EXPECT(inc).toBe(2);
 				});
 			});
 		});
-		
+
 		DESCRIBE("vector<int> type varialbe first section", {
 			static vector<int> vec;
-			
+
 			BEFORE_ALL({
 				for(int i=0;i<10;i++)
 					vec.push_back(i);
 			});
-			
+
 			IT("Vector should contains 10 items", {
 				EXPECT((int)vec.size()).toBe(10);
 			});
 		});
-		
+
 		DESCRIBE("vector<int> type variable second section", {
 			vector<int> vec;
-			
+
 			BEFORE_ALL({
 				for(int i=0;i<8;i++)
 					vec.push_back(i);
 			});
-			
+
 			IT("Vector should contains 8 items", {
 				EXPECT((int)vec.size()).toBe(8);
 			});
 		});
-		
+
 		DESCRIBE("int variable that will be shared", {
 			int shared = 5;
-			
+
 			DESCRIBE("Redeclared", {
 				int shared = 15;
-				
+
 				IT("shared variable should be eq to 15", {
 					EXPECT(shared).toBe(15);
 				});
 			});
-			
+
 			DESCRIBE("Reuse of shared variable", {
-				
+
 				BEFORE_ALL({
 					shared += 5;
 				});
-				
+
 				IT("shared variable should be eq to 5", {
 					EXPECT(shared).toBe(10);
 				});
 			});
 		});
-		
+
 		DESCRIBE("auto type variables", {
 			auto vec = vector<int>();
 
 			for(int i=0;i<100;i++)
 				vec.push_back(i);
-				
+
 			IT("vec variable should contain 100 elements", {
 				EXPECT((int)vec.size()).toBe(100);
 			});
 		});
-		
+
 		DESCRIBE("auto pointer type variables", {
 			auto vec = new vector<int>();
-			
-			BEFORE_ALL({					
+
+			BEFORE_ALL({
 				for(int i=0;i<100;i++){
 					vec->push_back(i);
 				}
 			});
-			
+
 			AFTER_ALL({
 				delete vec;
 			});
-			
+
 			IT("vec variable should be a pointer and contain 100 elements", {
 				EXPECT((int)vec->size()).toBe(100);
 			});
 		});
-		
+
 	});
-	
+
 	DESCRIBE("Dynamic time duration variables", {
 		int* a = new int(0);
-		
+
 		DESCRIBE("with before_each increment function", {
 			BEFORE_EACH({
 				(*a)++;
 			});
-			
+
 			IT("a variable should be equal to 1", {
 				EXPECT(*a).toBe(1);
 			});
-			
+
 			IT("a variable should be equal to 2", {
 				EXPECT(*a).toBe(2);
 			});
-			
+
 			AFTER_ALL({
 				delete a;
 			});
 		});
 	});
-	
+
 	DESCRIBE("NOT expect method", {
 		auto a = 1;
 		auto b = 15.5;
-		
+
 		BEFORE_ALL({
 			a = 10;
 		});
-		
+
 		IT("a should not toBe equal to 1", {
 			EXPECT(a).NOT().toBe(1);
 		});
-		
+
 		IT("a should not toBeLessThan 10", {
 			EXPECT(a).NOT().toBeLessThan(10);
 		});
-		
+
 		IT_SKIP("a should not toBeLessThanOrEqual 9", {
 			EXPECT(a).NOT().toBeLessThanOrEqual(9);
 		});
-		
+
 		IT("should not toThrowError", {
 			EXPECT([](){
 				int foo = 5;
@@ -198,94 +198,94 @@ DESCRIBE_ONLY("[Test]", {
 				// party hard...
 			}).NOT().toThrowError();
 		});
-		
+
 		IT("b should not toBeCloseTo 15 with precision of 0.49", {
 			EXPECT(b).NOT().toBeCloseTo(15,0.49);
 		});
-		
+
 		IT("should return false", {
 			EXPECT([](){ return !1; }).NOT().toReturnTrue();
 		});
-		
+
 		AFTER_ALL({
 			a = 1;
 		});
 	});
-	
+
 	DESCRIBE("toBeCloseTo expect method", {
 		auto a = 15.5;
-		
+
 		IT("a should be close to 15 with precision of 0.5", {
 			EXPECT(a).toBeCloseTo(15, 0.5);
 		});
 	});
-	
+
 	DESCRIBE("toBeIterableEqual expect method", {
 		auto vec = vector<int>();
-		
+
 		BEFORE_ALL({
 			for(int i=5;i<10;i++)
 				vec.push_back(i);
 		});
-		
+
 		IT("vec should toBeIterableEqual to {5,6,7,8,9}", {
 			EXPECT(vec).toBeIterableEqual({5,6,7,8,9});
 		});
-		
+
 		IT("vec should toBeIterableEqual to list<int>{5,6,7,8,9}", {
 			list<int> comp;
 			for(int i=5;i<10;i++)
 				comp.push_back(i);
-			
+
 			EXPECT(vec).toBeIterableEqual(comp);
 		});
 	});
-	
+
 	DESCRIBE("toReturnTrue expect method", {
 		auto fun = [](){ return 10>5; };
-		
+
 		IT("fun should return true", {
 			EXPECT(fun).toReturnTrue();
 		});
 	});
-	
+
 	DESCRIBE("toThrowError expect method", {
 		IT("Should throw an error", {
 			EXPECT([](){ throw "error here"; }).toThrowError();
 		});
 	});
-	
+
 	DESCRIBE_SKIP("skip describe", {
-		
+
 		BEFORE_ALL({
 			//should be skipped
 			exit(1);
 		});
-		
+
 		BEFORE_EACH({
 			//should be skipped
 			exit(1);
 		});
-		
+
 		AFTER_ALL({
 			//should be skipped
 			exit(1);
 		});
-		
+
 		AFTER_EACH({
 			//should be skipped
 			exit(1);
 		});
-		
+
 		IT("should be skipped", {
 			TEST_SUCCEED();
 		});
-		
+
 		IT("should be skipped as well", {
 			TEST_FAILED();
 		});
 	});
-	
+
 	DESCRIBE("Scope", {
 		int a = 10;
 		IT("the `a` variable should be between `10` and `15`", {
@@ -308,7 +308,7 @@ DESCRIBE_ONLY("[Test]", {
 			});
 		});
 	});
-	
+
 	DESCRIBE("Step array values", {
 		int* arr;
 		BEFORE_ALL({
@@ -327,7 +327,7 @@ DESCRIBE_ONLY("[Test]", {
 			delete[] arr;
 		});
 	});
-	
+
 	DESCRIBE("std::set", {
 		std::set<int> s;
 		BEFORE_EACH({
@@ -356,7 +356,7 @@ DESCRIBE_ONLY("[Test]", {
 			});
 		});
 	});
-	
+
 	DESCRIBE("Additional variables inside `IT`", {
 		IT("The size of vector should be one more than the size of hash table", {
 			vector<int> v{1,1,2,3,5,8,13};
@@ -367,19 +367,19 @@ DESCRIBE_ONLY("[Test]", {
 			EXPECT(v.size()).toBe(s.size()+1);
 		});
 	});
-	
+
 	DESCRIBE("Type transform", {
 		IT("Varialbes should be equal", {
 			long a = 10;
 			int exp = 10;
 			EXPECT(a).toBe((long)exp);
 		});
-		
+
 		IT("Vector size should be 10", {
 			EXPECT((int)(vector<int>{1,2,3,4,5,6,7,8,9,10}).size()).to_be(10);
 		});
 	});
-	
+
 	DESCRIBE("Hooks order", {
 		vector<int> order_list;
 		BEFORE_ALL({
@@ -388,7 +388,7 @@ DESCRIBE_ONLY("[Test]", {
 		BEFORE_EACH({
 			order_list.push_back(2);
 		});
-		
+
 		DESCRIBE("with multi level of DESCRIBE's", {
 			BEFORE_EACH({
 				order_list.push_back(4);
@@ -396,58 +396,58 @@ DESCRIBE_ONLY("[Test]", {
 			BEFORE_ALL({
 				order_list.push_back(3);
 			});
-			
+
 			IT("`order_list should contains values {1,2,2,3,4}`", {
 				EXPECT(order_list).toBeIterableEqual({1,2,2,3,4});
 			});
 		});
-		
+
 		IT("`order_list` should contains values {1,2}", {
 			EXPECT(order_list).toBeIterableEqual({1,2});
 		});
 	});
-	
+
 	DESCRIBE("Execution order", {
 		int ta = 1;
-		
+
 		IT("`ta` should be equal to 1", {
 			EXPECT(ta).toBe(1);
 		});
-		
+
 		DESCRIBE("overwrite `ta` with 2", {
 			ta = 2;
-			
+
 			IT("`ta` should be equal to 2", {
 				EXPECT(ta).toBe(2);
 			});
 		});
 	});
-    
+
     DESCRIBE("brefore/after run for skipped content", {
         bool should_stay_false = false;
         DESCRIBE("Everything skipped inside", {
-            
+
             BEFORE_ALL({
                 should_stay_false = true;
             });
-            
+
             AFTER_ALL({
                 should_stay_false = true;
             });
-            
+
             BEFORE_EACH({
                 should_stay_false = true;
             });
-            
+
             AFTER_EACH({
                 should_stay_false = true;
             });
-            
+
             DESCRIBE_SKIP("Skipped content", {
                 IT("I am skipped", {
                     TEST_FAILED();
                 });
-                
+
                 DESCRIBE("Also skipped content", {
                     IT("I am skipped", {
                         TEST_FAILED();
@@ -455,32 +455,32 @@ DESCRIBE_ONLY("[Test]", {
                 });
             });
         });
-        
+
         DESCRIBE("Check skippness", {
             IT("`should_stay_false` should still be `false`", {
                 EXPECT(should_stay_false).toBe(false);
             });
         });
     });
-}); 
+});
 
 
 DESCRIBE("This one is another describe that beside to DESCRIBE_ONLY rule", {
-	
+
 	IT("should not be visilble", {
 		TEST_FAILED();
 	});
-	
+
 	IT("should not be visilble too", {
 		TEST_FAILED();
 	});
-	
+
 	IT_ONLY("should be visible as IT_ONLY rule applied", {
 		TEST_SUCCEED();
 		INFO_PRINT("some additional info");
 		INFO_PRINT() << "another " << 123 << " info";
 	});
-	
+
 	IT("should not be visible eaither", {
 		TEST_FAILED();
 	});
