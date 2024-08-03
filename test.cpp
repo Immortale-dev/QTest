@@ -45,6 +45,10 @@ DESCRIBE_ONLY("[Test]", {
 				IT("Third test - inc variable should be equals to 3", {
 					EXPECT(inc).toBe(3);
 				});
+
+				IT("should fail", {
+					EXPECT(inc).toBe(10);
+				});
 			});
 
 			DESCRIBE("Sum of variables", {
@@ -207,6 +211,10 @@ DESCRIBE_ONLY("[Test]", {
 			EXPECT([](){ return !1; }).NOT().toReturnTrue();
 		});
 
+		IT("should fail", {
+			EXPECT([](){ return !1; }).toReturnTrue();
+		});
+
 		AFTER_ALL({
 			a = 1;
 		});
@@ -217,6 +225,10 @@ DESCRIBE_ONLY("[Test]", {
 
 		IT("a should be close to 15 with precision of 0.5", {
 			EXPECT(a).toBeCloseTo(15, 0.5);
+		});
+
+		IT("should fail", {
+			EXPECT(a).toBeCloseTo(16, 0.25);
 		});
 	});
 
@@ -291,6 +303,10 @@ DESCRIBE_ONLY("[Test]", {
 		IT("the `a` variable should be between `10` and `15`", {
 			EXPECT(a).toBeLessThan(15);
 			EXPECT(a).toBeGreaterThanOrEqual(10);
+		});
+		IT("should fail", {
+			EXPECT(a).toBeLessThan(15);
+			EXPECT(a).toBeLessThan(5);
 		});
 		IT("`a` should be equals to 10", {
 			EXPECT(a).toBe(10); // Works as expected
@@ -399,6 +415,13 @@ DESCRIBE_ONLY("[Test]", {
 
 			IT("`order_list should contains values {1,2,2,3,4}`", {
 				EXPECT(order_list).toBeIterableEqual({1,2,2,3,4});
+			});
+
+			IT("should fail", {
+				vector<int> a{1,2,3,4,5};
+				vector<int> b{2,3,4,5,6};
+
+				EXPECT(a).toBeIterableEqual(b);
 			});
 		});
 

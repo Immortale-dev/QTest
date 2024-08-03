@@ -111,7 +111,7 @@ void QTestExpect<T>::toBeIterableEqual(CT compare)
 	}
 	res &= it == val.end();
 	res &= itc == compare.end();
-	(*result) = proceed_result(res);
+	(*result) &= proceed_result(res);
 }
 
 template<typename T>
@@ -136,7 +136,7 @@ void QTestExpect<T>::toThrowError()
 template<typename T>
 void QTestExpect<T>::toReturnTrue()
 {
-	proceed_result(val());
+	(*result) &= proceed_result(val());
 }
 
 
