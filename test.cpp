@@ -396,7 +396,7 @@ DESCRIBE_ONLY("[Test]", {
 		});
 	});
 
-	DESCRIBE("Hooks order", {
+	DESCRIBE("Before hooks order", {
 		vector<int> order_list;
 		BEFORE_ALL({
 			order_list.push_back(1);
@@ -427,6 +427,48 @@ DESCRIBE_ONLY("[Test]", {
 
 		IT("`order_list` should contains values {1,2}", {
 			EXPECT(order_list).toBeIterableEqual({1,2});
+		});
+	});
+
+	vector<int> order_list;
+	DESCRIBE("After hooks order", {
+		DESCRIBE("Start", {
+			AFTER_ALL({
+				order_list.push_back(1);
+			});
+			AFTER_EACH({
+				order_list.push_back(2);
+			});
+
+			DESCRIBE("with multi level of DESCRIBE's", {
+				AFTER_EACH({
+					order_list.push_back(4);
+				});
+				AFTER_ALL({
+					order_list.push_back(3);
+				});
+
+				IT("`order_list should contain values {2}`", {
+					EXPECT(order_list).toBeIterableEqual({2});
+				});
+
+				IT("`order_list should contains values {2,4,2}`", {
+					EXPECT(order_list).toBeIterableEqual({2,4,2});
+				});
+			});
+
+			IT("`order_list` should contains values {4,2,4,2,3}", {
+				EXPECT(order_list.size()).toBe(0);
+			});
+		});
+		IT("`order_list` should contains values {4,2,4,2,3,2,1}", {
+			EXPECT(order_list.size()).toBe(0);
+		});
+	});
+
+	DESCRIBE("After all hooks", {
+		IT("`order_list` should contain {}", {
+			EXPECT(order_list).toBeIterableEqual({2,4,2,4,2,3,1});
 		});
 	});
 

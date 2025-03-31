@@ -333,11 +333,10 @@ inline QTestBase::func_arr QTestBase::get_after_each(node* n)
 	func_arr afterEach;
 	node* temp = n;
 	while(temp){
-		for(int i=temp->after_each.size()-1;i>=0;i--)
+		for(size_t i=0;i<temp->after_each.size();i++)
 			afterEach.push_back(temp->after_each[i]);
 		temp = temp->parent;
 	}
-	std::reverse(afterEach.begin(), afterEach.end());
 	return afterEach;
 }
 
