@@ -1,41 +1,30 @@
 #ifndef QTEST_H
 #define QTEST_H
 
-#include <functional>
 #include "qtestbase.hpp"
 #include "qtestutils.hpp"
 
-#define DESCRIBE(a, ...) Q_TEST__DESCRIBE(a, Q_TEST__LAMBDA_CALLBACK(__VA_ARGS__), QTEST_TEST_PARAM_ID, __FILE__)
-#define DESCRIBE_ONLY(a, ...) Q_TEST__DESCRIBE(a, Q_TEST__LAMBDA_CALLBACK(__VA_ARGS__), QTEST_ONLY_PARAM_ID, __FILE__)
-#define DESCRIBE_SKIP(a, ...) Q_TEST__DESCRIBE(a, Q_TEST__LAMBDA_CALLBACK(__VA_ARGS__), QTEST_SKIP_PARAM_ID, __FILE__)
-#define BEFORE_ALL(...) QTESTOBJECTDEFINED.before(Q_TEST__LAMBDA(__VA_ARGS__))
-#define BEFORE_EACH(...) QTESTOBJECTDEFINED.before_each(Q_TEST__LAMBDA(__VA_ARGS__))
-#define AFTER_ALL(...) QTESTOBJECTDEFINED.after(Q_TEST__LAMBDA(__VA_ARGS__))
-#define AFTER_EACH(...) QTESTOBJECTDEFINED.after_each(Q_TEST__LAMBDA(__VA_ARGS__))
-#define IT(a, ...) QTESTOBJECTDEFINED.it(a, Q_TEST__LAMBDA(__VA_ARGS__), QTEST_TEST_PARAM_ID); Q_TEST__CALLBACK()
-#define IT_ONLY(a, ...) QTESTOBJECTDEFINED.it(a, Q_TEST__LAMBDA(__VA_ARGS__), QTEST_ONLY_PARAM_ID); Q_TEST__CALLBACK()
-#define IT_SKIP(a, ...) QTESTOBJECTDEFINED.it(a, Q_TEST__LAMBDA(__VA_ARGS__), QTEST_SKIP_PARAM_ID); Q_TEST__CALLBACK()
-#define EXPECT(a) QTESTOBJECTDEFINED.expect((a))
-#define INFO_PRINT(a) QTESTOBJECTDEFINED.info_print(a)
-#define TEST_FAILED() EXPECT(1).toBe(0)
+#define DESCRIBE(a, ...) Q_TEST_NS_DETAIL::BASE.describe(a, Q_TEST__LAMBDA_CALLBACK(__VA_ARGS__), QTEST_TEST_PARAM_ID, __FILE__)
+#define DESCRIBE_ONLY(a, ...) Q_TEST_NS_DETAIL::BASE.describe(a, Q_TEST__LAMBDA_CALLBACK(__VA_ARGS__), QTEST_ONLY_PARAM_ID, __FILE__)
+#define DESCRIBE_SKIP(a, ...) Q_TEST_NS_DETAIL::BASE.describe(a, Q_TEST__LAMBDA_CALLBACK(__VA_ARGS__), QTEST_SKIP_PARAM_ID, __FILE__)
+#define BEFORE_ALL(...) Q_TEST_NS_DETAIL::BASE.before(Q_TEST__LAMBDA(__VA_ARGS__))
+#define BEFORE_EACH(...) Q_TEST_NS_DETAIL::BASE.before_each(Q_TEST__LAMBDA(__VA_ARGS__))
+#define AFTER_ALL(...) Q_TEST_NS_DETAIL::BASE.after(Q_TEST__LAMBDA(__VA_ARGS__))
+#define AFTER_EACH(...) Q_TEST_NS_DETAIL::BASE.after_each(Q_TEST__LAMBDA(__VA_ARGS__))
+#define IT(a, ...) Q_TEST_NS_DETAIL::BASE.it(a, Q_TEST__LAMBDA(__VA_ARGS__), QTEST_TEST_PARAM_ID, __LINE__)
+#define IT_ONLY(a, ...) Q_TEST_NS_DETAIL::BASE.it(a, Q_TEST__LAMBDA(__VA_ARGS__), QTEST_ONLY_PARAM_ID, __LINE__)
+#define IT_SKIP(a, ...) Q_TEST_NS_DETAIL::BASE.it(a, Q_TEST__LAMBDA(__VA_ARGS__), QTEST_SKIP_PARAM_ID, __LINE__)
+#define EXPECT(a) Q_TEST__RETURN_IF_FALSE(Q_TEST_NS_DETAIL::BASE.expect((a), Q_TEST__STRINGIFY(a)))
+#define INFO_PRINT(a) Q_TEST_NS_DETAIL::BASE.info_print(a)
+#define TEST_FAILED(a) EXPECT(std::string{a}).fail();
 #define TEST_SUCCEED() EXPECT(1).toBe(1)
-#define SCENARIO_START Q_TEST__TEST_UNIT (QTEST_SCENARIO_SIGN, []{
-#define SCENARIO_END }, QTEST_TEST_PARAM_ID, __FILE__);
+#define SCENARIO_START Q_TEST__TEST_UNIT ([]{
+#define SCENARIO_END });
 
-
-// Initialize file local helpers
-namespace{
-	QTestBase QTESTOBJECTDEFINED = QTestBase();
-	using function_cb_t = std::function<void()>;
-	struct QTestDescribe_t
-	{
-		QTestDescribe_t(std::string str, function_cb_t fn, int param, const char* file){ QTESTOBJECTDEFINED.describe(str, fn, param, file); };
-	};
-	Q_TEST__CALLBACK();
+namespace Q_TEST_NS_DETAIL {
+	// Initialize file local helpers
+	inline QTestBase BASE = QTestBase();
 }
-
-
-
 
 /** ***********************USAGE****************************
  *

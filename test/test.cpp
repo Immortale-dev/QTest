@@ -21,6 +21,19 @@ DESCRIBE_ONLY("[Test]", {
 		IT("should fail as TEST_FAILED method used", {
 			TEST_FAILED();
 		});
+
+		IT("should fail with a message", {
+			TEST_FAILED("Yeah, I'm the message!");
+		});
+
+		IT("should fail with NOT", {
+			EXPECT(10).NOT().toBe(10);
+		});
+
+		IT("should fail string comparison", {
+			std::string str = "hello";
+			EXPECT(str).toBe("world");
+		});
 	});
 
 	DESCRIBE("Variables", {
@@ -46,8 +59,9 @@ DESCRIBE_ONLY("[Test]", {
 					EXPECT(inc).toBe(3);
 				});
 
-				IT("should fail", {
+				IT("should fail with info", {
 					EXPECT(inc).toBe(10);
+					INFO_PRINT() << "INFO" << 13;
 				});
 			});
 
@@ -80,7 +94,7 @@ DESCRIBE_ONLY("[Test]", {
 					vec.push_back(i);
 			});
 
-			IT("Vector should contains 10 items", {
+			IT("Vector should contain 10 items", {
 				EXPECT((int)vec.size()).toBe(10);
 			});
 		});
@@ -93,7 +107,7 @@ DESCRIBE_ONLY("[Test]", {
 					vec.push_back(i);
 			});
 
-			IT("Vector should contains 8 items", {
+			IT("Vector should contain 8 items", {
 				EXPECT((int)vec.size()).toBe(8);
 			});
 		});
@@ -251,6 +265,15 @@ DESCRIBE_ONLY("[Test]", {
 
 			EXPECT(vec).toBeIterableEqual(comp);
 		});
+
+		IT("should fail", {
+			vector<int> a{1,2,3,4,5};
+			vector<int> b{2,3,4,5,6};
+
+			EXPECT(a).toBeIterableEqual(b);
+			// Never called
+			exit(3);
+		});
 	});
 
 	DESCRIBE("toReturnTrue expect method", {
@@ -271,22 +294,22 @@ DESCRIBE_ONLY("[Test]", {
 
 		BEFORE_ALL({
 			//should be skipped
-			exit(1);
+			exit(2);
 		});
 
 		BEFORE_EACH({
 			//should be skipped
-			exit(1);
+			exit(2);
 		});
 
 		AFTER_ALL({
 			//should be skipped
-			exit(1);
+			exit(2);
 		});
 
 		AFTER_EACH({
 			//should be skipped
-			exit(1);
+			exit(2);
 		});
 
 		IT("should be skipped", {
@@ -413,20 +436,13 @@ DESCRIBE_ONLY("[Test]", {
 				order_list.push_back(3);
 			});
 
-			IT("`order_list should contains values {1,2,2,3,4}`", {
-				EXPECT(order_list).toBeIterableEqual({1,2,2,3,4});
-			});
-
-			IT("should fail", {
-				vector<int> a{1,2,3,4,5};
-				vector<int> b{2,3,4,5,6};
-
-				EXPECT(a).toBeIterableEqual(b);
+			IT("`order_list should contain values {1,2,3,4}`", {
+				EXPECT(order_list).toBeIterableEqual({1,2,3,4});
 			});
 		});
 
-		IT("`order_list` should contains values {1,2}", {
-			EXPECT(order_list).toBeIterableEqual({1,2});
+		IT("`order_list` should contain values {1,2,3,4,2}", {
+			EXPECT(order_list).toBeIterableEqual({1,2,3,4,2});
 		});
 	});
 
@@ -448,27 +464,21 @@ DESCRIBE_ONLY("[Test]", {
 					order_list.push_back(3);
 				});
 
-				IT("`order_list should contain values {2}`", {
-					EXPECT(order_list).toBeIterableEqual({2});
+				IT("`order_list should contain values {}`", {
+					EXPECT(order_list.size()).toBe(0);
 				});
 
-				IT("`order_list should contains values {2,4,2}`", {
-					EXPECT(order_list).toBeIterableEqual({2,4,2});
+				IT("`order_list should contain values {4,2}`", {
+					EXPECT(order_list).toBeIterableEqual({4,2});
 				});
 			});
 
-			IT("`order_list` should contains values {4,2,4,2,3}", {
-				EXPECT(order_list.size()).toBe(0);
+			IT("`order_list` should contain values {4,2,4,2,3}", {
+				EXPECT(order_list).toBeIterableEqual({4,2,4,2,3});
 			});
 		});
-		IT("`order_list` should contains values {4,2,4,2,3,2,1}", {
-			EXPECT(order_list.size()).toBe(0);
-		});
-	});
-
-	DESCRIBE("After all hooks", {
-		IT("`order_list` should contain {}", {
-			EXPECT(order_list).toBeIterableEqual({2,4,2,4,2,3,1});
+		IT("`order_list` should contain values {4,2,4,2,3,2,1}", {
+			EXPECT(order_list).toBe({4,2,4,2,3,2,1});
 		});
 	});
 

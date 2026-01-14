@@ -13,31 +13,36 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <algorithm>
 #include <sstream>
 
+namespace Q_TEST_NS_DETAIL {
+
 class QTestPrint
 {
-	using string = std::string;
 	using test_infos = std::vector<std::stringstream>;
 
 	public:
 		QTestPrint();
-		void print_description(string& str);
-		void print_description_extended(string& str, string& file);
-		void print_test(string& str, bool good, bool skipped);
-		void print_test_info(test_infos& arr);
-		void print_falied_test(string& str);
+		void print(std::string_view s);
+		void print(std::string&& s);
+		void print(const char* s);
+
+		void print_description(std::string_view str);
+		void print_test(std::string_view str, bool good, bool skipped);
+		void print_test_info(std::string_view arr);
+		void print_test_error(std::string_view s);
+		void print_failed_test(std::string_view str, std::string_view file, int line);
 		void print_statistics(int tests_count, int tests_failed, int tests_skipped);
 		void print_start();
-		void print_title(string str);
+		void print_title(std::string_view str);
 		void print_delimeter();
-		void print_delimeter(string c);
-		void print(string s);
-		void print_error(string s);
-		void print_success(string s);
-		void print_neutral(string s);
-		void print_grey(string s);
+		void print_delimeter(std::string_view c);
+		void print_error(std::string_view s);
+		void print_success(std::string_view s);
+		void print_neutral(std::string_view s);
+		void print_grey(std::string_view s);
 		void print_error_sign();
 		void print_success_sign();
 		void print_skip_sign();
@@ -53,20 +58,20 @@ class QTestPrint
 
 		enum class Color{Success, Error, Neutral, Grey, Default};
 
-		const string newline = "\n";
-		const string tab = "    ";
-		const string delim_txt = "*";
-		const string succeed_txt = "succeed";
-		const string failed_txt = "failed";
-		const string skipped_txt = "skipped";
-		const string statistics_txt = "statistics";
-		const string testing_txt = "testing";
-		const string succ_sign = "[/]";
-		const string fail_sign = "[x]";
-		const string skip_sign = "[-]";
+		static constexpr std::string_view newline = "\n";
+		static constexpr std::string_view tab = "    ";
+		static constexpr std::string_view delim_txt = "*";
+		static constexpr std::string_view succeed_txt = "succeed";
+		static constexpr std::string_view failed_txt = "failed";
+		static constexpr std::string_view skipped_txt = "skipped";
+		static constexpr std::string_view statistics_txt = "statistics";
+		static constexpr std::string_view testing_txt = "testing";
+		static constexpr std::string_view succ_sign = "[/]";
+		static constexpr std::string_view fail_sign = "[x]";
+		static constexpr std::string_view skip_sign = "[-]";
 
-		string create_titled_message(string str);
-		string toupper(string txt);
+		std::string create_titled_message(std::string_view str);
+		std::string toupper(std::string_view txt);
 		void processConsoleWindow();
 		void set_color_default();
 		void set_color_error();
@@ -82,21 +87,15 @@ inline QTestPrint::QTestPrint()
 	processConsoleWindow();
 }
 
-inline void QTestPrint::print_description(string& str)
+inline void QTestPrint::print_description(std::string_view str)
 {
 	print(newline);
-	print(" "+str+newline);
-}
-
-inline void QTestPrint::print_description_extended(string& str, string& file)
-{
-	print(newline);
-	print(" "+str);
-	print_neutral("("+file+")");
+	print("  ");
+	print(str);
 	print(newline);
 }
 
-inline void QTestPrint::print_test(string& str, bool good, bool skipped)
+inline void QTestPrint::print_test(std::string_view str, bool good, bool skipped)
 {
 	print("    ");
 
@@ -111,31 +110,40 @@ inline void QTestPrint::print_test(string& str, bool good, bool skipped)
 	}
 
 	print(" ");
-	good ? print_grey(str) : print_error(str);
+	print_grey(str);
 
-	if(skipped)
-		print_neutral(" ("+skipped_txt+")");
+	if(skipped) {
+		std::string str = std::string{" ("} + std::string(skipped_txt) + std::string{")"};
+		print_neutral(str);
+	}
 
 	print(newline);
 }
 
-inline void QTestPrint::print_test_info(test_infos& arr)
+inline void QTestPrint::print_test_info(std::string_view s)
 {
-	for(auto& it : arr){
-		print("        ");
-		print(" - ");
-		string s(std::istreambuf_iterator<char>(it), {});
-		print_grey(s);
-		print(newline);
-	}
+	print("        ");
+	print(" - ");
+	print_grey(s);
+	print(newline);
 }
 
-inline void QTestPrint::print_falied_test(string& str)
+inline void QTestPrint::print_test_error(std::string_view s)
+{
+	print("        ");
+	print(" - ");
+	print_error(s);
+	print(newline);
+}
+
+inline void QTestPrint::print_failed_test(std::string_view str, std::string_view file, int line)
 {
 	print(tab);
 	print_error_sign();
 	print(" ");
 	print_grey(str);
+	std::string pstr = std::string{" ("} + std::string(file) + std::string{":"} + std::to_string(line) + std::string{")"};
+	print_neutral(pstr);
 	print(newline);
 }
 
@@ -157,24 +165,28 @@ inline void QTestPrint::print_skip_sign()
 inline void QTestPrint::print_statistics(int tests_count, int tests_failed, int tests_skipped)
 {
 	print(newline);
-	print_title(toupper(statistics_txt));
+	std::string title_upper = toupper(statistics_txt);
+	print_title(title_upper);
 	print(newline);
 
 	print_success_sign();
-	print_grey(" "+toupper(succeed_txt)+": ");
+	std::string success_message = std::string{" "} + toupper(succeed_txt) + std::string(": ");
+	print_grey(success_message);
 	print(std::to_string(tests_count-tests_failed-tests_skipped));
 	print(newline);
 
 	if(tests_skipped){
 		print_skip_sign();
-		print_grey(" "+toupper(skipped_txt)+": ");
+		std::string skip_message = std::string{" "} + toupper(skipped_txt) + std::string{": "};
+		print_grey(skip_message);
 		print(std::to_string(tests_skipped));
 		print(newline);
 	}
 
 	if(tests_failed){
 		print_error_sign();
-		print_grey(" "+toupper(failed_txt)+": ");
+		std::string failed_message = std::string{" "} + toupper(failed_txt) + std::string{": "};
+		print_grey(failed_message);
 		print(std::to_string(tests_failed));
 		print(newline);
 	}
@@ -187,9 +199,9 @@ inline void QTestPrint::print_start()
 	print_title(toupper(testing_txt));
 }
 
-inline std::string QTestPrint::create_titled_message(string str)
+inline std::string QTestPrint::create_titled_message(std::string_view str)
 {
-	string ret = "";
+	std::string ret = "";
 	int blength = line_length-(int)str.size();
 	for(int i=0;i<blength/2;i++)
 		ret += delim_txt;
@@ -199,7 +211,7 @@ inline std::string QTestPrint::create_titled_message(string str)
 	return ret;
 }
 
-inline void QTestPrint::print_title(string str)
+inline void QTestPrint::print_title(std::string_view str)
 {
 	print(create_titled_message(str));
 }
@@ -209,48 +221,58 @@ inline void QTestPrint::print_delimeter()
 	print_delimeter(delim_txt);
 }
 
-inline void QTestPrint::print_delimeter(string c)
+inline void QTestPrint::print_delimeter(std::string_view c)
 {
 	for(int i=0;i<line_length;i++)
 		print(c);
 }
 
-inline void QTestPrint::print(string s)
+inline void QTestPrint::print(std::string_view s)
 {
 	std::cout << s;
 }
 
-inline void QTestPrint::print_error(string s)
+inline void QTestPrint::print(std::string&& s)
+{
+	print(s);
+}
+
+inline void QTestPrint::print(const char* s)
+{
+	print(std::string_view(s));
+}
+
+inline void QTestPrint::print_error(std::string_view s)
 {
 	set_color_error();
 	print(s);
 	set_color_default();
 }
 
-inline void QTestPrint::print_success(string s)
+inline void QTestPrint::print_success(std::string_view s)
 {
 	set_color_success();
 	print(s);
 	set_color_default();
 }
 
-inline void QTestPrint::print_neutral(string s)
+inline void QTestPrint::print_neutral(std::string_view s)
 {
 	set_color_neutral();
 	print(s);
 	set_color_default();
 }
 
-inline void QTestPrint::print_grey(string s)
+inline void QTestPrint::print_grey(std::string_view s)
 {
 	set_color_grey();
 	print(s);
 	set_color_default();
 }
 
-inline std::string QTestPrint::toupper(string txt)
+inline std::string QTestPrint::toupper(std::string_view txt)
 {
-	string txtc(txt);
+	std::string txtc(txt);
 	std::transform(txtc.begin(), txtc.end(), txtc.begin(), ::toupper); 
 	return txtc;
 }
@@ -321,7 +343,7 @@ inline void QTestPrint::set_color(Color c)
 		}
 		SetConsoleTextAttribute(hConsole, color);
 	#else
-		string color;
+		std::string color;
 		switch(c){
 			case Color::Success:
 				color = "\033[32m";
@@ -352,5 +374,6 @@ inline void QTestPrint::print_failure_message()
 	print_error(create_titled_message(toupper(failed_txt)));
 }
 
+} // Q_TEST_NS_DETAIL
 
 #endif //QTESTPRINT_H
