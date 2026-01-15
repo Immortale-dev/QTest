@@ -15,6 +15,33 @@
 
 namespace Q_TEST_NS_DETAIL {
 
+std::string sanitize(std::string& value)
+{
+	std::string str;
+	for (char c : value) {
+		switch(c) {
+			case '\n':
+				str.append("\\n");
+				break;
+			case '\r':
+				str.append("\\r");
+				break;
+			case '\t':
+				str.append("\\t");
+				break;
+			case '\b':
+				str.append("\\b");
+				break;
+			case '\x1b':
+				str.append("\\x1b");
+				break;
+			default:
+				str.push_back(c);
+		}
+	}
+	return str;
+}
+
 class QTestBase
 {
 	using function_cb_t = std::function<void()>;
@@ -87,6 +114,8 @@ class QTestBase
 		void show_start();
 		void show_statistics();
 
+		void show_test_results(Test& t, bool is_skip);
+
 		void show_failed_tests();
 		void show_succeed();
 
@@ -119,7 +148,7 @@ inline QTestBase::QTestBase()
 inline QTestBase::~QTestBase()
 {
 	show_statistics();
-	if(tests_failed){
+	if(tests_failed) {
 		exit(1);
 	}
 }
@@ -174,14 +203,7 @@ inline void QTestBase::it(std::string str, function_cb_t fn, int param, int line
 	}
 
 	// Print test
-	P->print_test(current_test->text, current_test->result, is_skip);
-	for (auto &s : current_test->info_prints) {
-		P->print_test_info(s.str());
-	}
-	if (!current_test->result) {
-		std::string error_text = generate_test_error(current_test->expect_str, current_test->error);
-		P->print_test_error(error_text);
-	}
+	show_test_results(*current_test, is_skip);
 
 	describes_changed = false;
 }
@@ -333,6 +355,8 @@ inline std::string QTestBase::generate_test_error(std::string_view expect_str, E
 		res += "TEST_FAILED("+error.value+") was called!";
 		return res;
 	}
+	error.value = sanitize(error.value);
+	error.compare = sanitize(error.compare);
 	if (error.value.size() > 20) {
 		error.value.resize(20);
 		error.value += "...";
@@ -361,14 +385,7 @@ inline void QTestBase::show_failed_tests()
 		P->print_description(descr);
 
 		for (auto t : tests) {
-			P->print_failed_test(t->text, describes.back()->file, t->line);
-			for (auto &s : t->info_prints) {
-				P->print_test_info(s.str());
-			}
-			if (!t->result) {
-				std::string error_text = generate_test_error(t->expect_str, t->error);
-				P->print_test_error(error_text);
-			}
+			show_test_results(*t, false);
 		}
 	}
 }
@@ -387,6 +404,18 @@ inline void QTestBase::show_statistics()
 		show_succeed();
 	}
 	P->print_delimeter("_");
+}
+
+inline void QTestBase::show_test_results(Test& t, bool is_skip)
+{
+	P->print_test(t.text, t.result, is_skip);
+	for (auto &s : t.info_prints) {
+		P->print_test_info(s.str());
+	}
+	if (!t.result) {
+		std::string error_text = generate_test_error(t.expect_str, t.error);
+		P->print_test_error(error_text);
+	}
 }
 
 inline void QTestBase::show_succeed()

@@ -1,6 +1,11 @@
 #ifndef QTEST_H
 #define QTEST_H
 
+// TODO:
+// update single header file
+// test all projects
+// update docs
+
 #include "qtestbase.hpp"
 #include "qtestutils.hpp"
 
@@ -23,11 +28,12 @@
 
 namespace Q_TEST_NS_DETAIL {
 	// Initialize file local helpers
-	inline QTestBase BASE = QTestBase();
+	inline QTestBase BASE;
 }
 
 /** ***********************USAGE****************************
  *
+ * SCENARIO_START
  *
  * DESCRIBE("...",{
  *
@@ -64,6 +70,8 @@ namespace Q_TEST_NS_DETAIL {
  *     AFTEREACH({ ... });
  *     AFTERALL({...});
  * });
+ *
+ * SCENARIO_END
  *
  * ***********************************************************/
 

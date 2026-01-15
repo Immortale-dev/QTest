@@ -41,8 +41,7 @@ class QTestExpect
 			: val(std::move(a)), result(result), error(error) {};
 		QTestExpect(T& a, bool* result, ErrorReport* error)
 			: val(a), result(result), error(error) {};
-		bool toBe(T&& compare);
-		bool toBe(T& compare);
+		template<typename C> bool toBe(C&& compare);
 		bool toBeCloseTo(T compare, T precision);
 		bool toBeGreaterThan(T compare);
 		bool toBeGreaterThanOrEqual(T compare);
@@ -60,8 +59,7 @@ class QTestExpect
 		bool fail();
 
 		//Aliases
-		bool to_be(T&& compare){ return toBe(std::move(compare)); }
-		bool to_be(T& compare){ return toBe(compare); }
+		template<typename C> bool to_be(C&& compare){ return toBe(std::move(compare)); }
 		bool to_be_close_to(T compare, T precision){ return toBeCloseTo(compare, precision); }
 		bool to_be_greater_than(T compare){ return toBeGreaterThan(compare); }
 		bool to_be_greater_than_or_equal(T compare){ return toBeGreaterThanOrEqual(compare); }
@@ -78,7 +76,7 @@ class QTestExpect
 
 	private:
 		bool proceed_result(bool result);
-		void report_error(std::string_view func, std::string_view value, std::string_view compare, bool resolved);
+		void report_error_resolved(std::string_view func, std::string_view value, std::string_view compare);
 		template<typename V, typename C> void report_error(std::string_view func, V&& value, C&& compare);
 		template<typename V> void report_error(std::string_view func, V&& value);
 		template<typename CT> std::string iterable_to_str(CT&& value);
@@ -91,16 +89,8 @@ class QTestExpect
 };
 
 template<typename T>
-bool QTestExpect<T>::toBe(T&& compare)
-{
-	if (!(*result &= proceed_result(val == compare))) {
-		report_error(__func__, val, compare);
-	}
-	return *result;
-}
-
-template<typename T>
-bool QTestExpect<T>::toBe(T& compare)
+template<typename C>
+bool QTestExpect<T>::toBe(C&& compare)
 {
 	if (!(*result &= proceed_result(val == compare))) {
 		report_error(__func__, val, compare);
@@ -113,7 +103,7 @@ bool QTestExpect<T>::toBeCloseTo(T compare, T precision)
 {
 	T v = val;
 	if (!(*result &= proceed_result(std::abs(v-compare) <= std::abs(precision)))) {
-		report_error(__func__, streamable_to_str(val), streamable_to_str(compare) + ", " + streamable_to_str(precision), true);
+		report_error_resolved(__func__, streamable_to_str(val), streamable_to_str(compare) + ", " + streamable_to_str(precision));
 	}
 	return *result;
 }
@@ -187,7 +177,7 @@ bool QTestExpect<T>::toBeIterableEqual(CT&& compare)
 	if(!(*result &= proceed_result(res))) {
 		using iter_value_t = decltype(*std::begin(compare));
 		if constexpr (is_streamable<iter_value_t>::value) {
-			report_error(__func__, iterable_to_str(val), iterable_to_str(compare), true);
+			report_error_resolved(__func__, iterable_to_str(val), iterable_to_str(compare));
 		} else {
 			report_error(__func__, val, compare);
 		}
@@ -279,7 +269,7 @@ bool QTestExpect<T>::proceed_result(bool result)
 }
 
 template<typename T>
-void QTestExpect<T>::report_error(std::string_view func, std::string_view value, std::string_view compare, [[maybe_unused]] bool resolved)
+void QTestExpect<T>::report_error_resolved(std::string_view func, std::string_view value, std::string_view compare)
 {
 	error->func = func;
 	error->inverse = inv;

@@ -5,7 +5,7 @@
 #include <unordered_set>
 
 #define TEST_ONLY_RULE
-#include "qtest.hpp"
+#include "dist/qtest.hpp"
 
 using namespace std;
 
@@ -33,6 +33,12 @@ DESCRIBE_ONLY("[Test]", {
 		IT("should fail string comparison", {
 			std::string str = "hello";
 			EXPECT(str).toBe("world");
+		});
+
+		IT("should sanitize the message", {
+			std::string str = "\x1b[31m;hel\n\tlo";
+			std::string cmp = "\r\b\tworld";
+			EXPECT(str).toBe(cmp);
 		});
 	});
 
@@ -465,7 +471,7 @@ DESCRIBE_ONLY("[Test]", {
 				});
 
 				IT("`order_list should contain values {}`", {
-					EXPECT(order_list.size()).toBe(0);
+					EXPECT((int)order_list.size()).toBe(0);
 				});
 
 				IT("`order_list should contain values {4,2}`", {
@@ -478,7 +484,7 @@ DESCRIBE_ONLY("[Test]", {
 			});
 		});
 		IT("`order_list` should contain values {4,2,4,2,3,2,1}", {
-			EXPECT(order_list).toBe({4,2,4,2,3,2,1});
+			EXPECT(order_list).toBeIterableEqual({4,2,4,2,3,2,1});
 		});
 	});
 
