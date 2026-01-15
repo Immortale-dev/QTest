@@ -15,7 +15,7 @@
 
 namespace Q_TEST_NS_DETAIL {
 
-std::string sanitize(std::string& value)
+inline std::string sanitize(std::string& value)
 {
 	std::string str;
 	for (char c : value) {

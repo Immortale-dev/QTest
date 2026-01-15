@@ -188,7 +188,7 @@ class QTestPrint
 
 struct QTestScenario { QTestScenario(std::function<void()> fn) { fn(); } };
 
-std::string sanitize(std::string& value)
+inline std::string sanitize(std::string& value)
 {
 	std::string str;
 	for (char c : value) {
