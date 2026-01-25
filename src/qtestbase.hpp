@@ -115,6 +115,8 @@ class QTestBase
 		void show_statistics();
 
 		void show_test_results(Test& t, bool is_skip);
+		void show_failed_test_results(Test& t, std::string_view file);
+		void show_test_infos(Test& t);
 
 		void show_failed_tests();
 		void show_succeed();
@@ -385,7 +387,7 @@ inline void QTestBase::show_failed_tests()
 		P->print_description(descr);
 
 		for (auto t : tests) {
-			show_test_results(*t, false);
+			show_failed_test_results(*t, describes[0]->file);
 		}
 	}
 }
@@ -406,9 +408,8 @@ inline void QTestBase::show_statistics()
 	P->print_delimeter("_");
 }
 
-inline void QTestBase::show_test_results(Test& t, bool is_skip)
+inline void QTestBase::show_test_infos(Test& t)
 {
-	P->print_test(t.text, t.result, is_skip);
 	for (auto &s : t.info_prints) {
 		P->print_test_info(s.str());
 	}
@@ -416,6 +417,18 @@ inline void QTestBase::show_test_results(Test& t, bool is_skip)
 		std::string error_text = generate_test_error(t.expect_str, t.error);
 		P->print_test_error(error_text);
 	}
+}
+
+inline void QTestBase::show_test_results(Test& t, bool is_skip)
+{
+	P->print_test(t.text, t.result, is_skip);
+	show_test_infos(t);
+}
+
+inline void QTestBase::show_failed_test_results(Test& t, std::string_view file)
+{
+	P->print_failed_test(t.text, file, t.line);
+	show_test_infos(t);
 }
 
 inline void QTestBase::show_succeed()

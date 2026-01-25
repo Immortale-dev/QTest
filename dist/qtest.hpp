@@ -1,4 +1,4 @@
-/* v2.0.0 */
+/* v2.0.2 */
 #ifndef QTEST_H
 #define QTEST_H
 
@@ -77,8 +77,7 @@ template <typename T>
 struct is_streamable<T, std::enable_if_t<std::is_convertible_v<decltype(std::declval<std::ostream &>() << std::declval<T>()),std::ostream &>>> : std::true_type {};
 
 template<typename T>
-class QTestExpect
-{
+class QTestExpect {
 	public:
 		QTestExpect(T&& a, bool* result, ErrorReport* error) : val(std::move(a)), result(result), error(error) {};
 		QTestExpect(T& a, bool* result, ErrorReport* error) : val(a), result(result), error(error) {};
@@ -128,8 +127,7 @@ class QTestExpect
 		bool inv = false;
 };
 
-class QTestPrint
-{
+class QTestPrint {
 	enum class Color{Success, Error, Neutral, Grey, Default};
 	using test_infos = std::vector<std::stringstream>;
 	public:
@@ -215,8 +213,7 @@ inline std::string sanitize(std::string& value)
 	return str;
 }
 
-class QTestBase
-{
+class QTestBase {
 	using function_cb_t = std::function<void()>;
 	using describe_function_cb_t = std::function<void(std::function<void()>)>;
 	struct Describe {
@@ -276,6 +273,8 @@ class QTestBase
 		void show_start();
 		void show_statistics();
 		void show_test_results(Test& t, bool is_skip);
+		void show_failed_test_results(Test& t, std::string_view file);
+		void show_test_infos(Test& t);
 		void show_failed_tests();
 		void show_succeed();
 
@@ -1013,7 +1012,7 @@ inline void QTestBase::show_failed_tests()
 		std::string descr = generate_describes_text(describes);
 		P->print_description(descr);
 		for (auto t : tests) {
-			show_test_results(*t, false);
+			show_failed_test_results(*t, describes[0]->file);
 		}
 	}
 }
@@ -1034,14 +1033,27 @@ inline void QTestBase::show_statistics()
 	P->print_delimeter("_");
 }
 
-inline void QTestBase::show_test_results(Test& t, bool is_skip)
+inline void QTestBase::show_test_infos(Test& t)
 {
-	P->print_test(t.text, t.result, is_skip);
-	for (auto &s : t.info_prints) P->print_test_info(s.str());
+	for (auto &s : t.info_prints) {
+		P->print_test_info(s.str());
+	}
 	if (!t.result) {
 		std::string error_text = generate_test_error(t.expect_str, t.error);
 		P->print_test_error(error_text);
 	}
+}
+
+inline void QTestBase::show_test_results(Test& t, bool is_skip)
+{
+	P->print_test(t.text, t.result, is_skip);
+	show_test_infos(t);
+}
+
+inline void QTestBase::show_failed_test_results(Test& t, std::string_view file)
+{
+	P->print_failed_test(t.text, file, t.line);
+	show_test_infos(t);
 }
 
 inline void QTestBase::show_succeed()
