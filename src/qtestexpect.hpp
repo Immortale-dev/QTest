@@ -41,6 +41,8 @@ class QTestExpect
 			: val(std::move(a)), result(result), error(error) {};
 		QTestExpect(T& a, bool* result, ErrorReport* error)
 			: val(a), result(result), error(error) {};
+		bool toBe(T&& compare);
+		bool toBe(T& compare);
 		template<typename C> bool toBe(C&& compare);
 		bool toBeCloseTo(T compare, T precision);
 		bool toBeGreaterThan(T compare);
@@ -59,6 +61,8 @@ class QTestExpect
 		bool fail();
 
 		//Aliases
+		bool to_be(T&& compare) { return toBe(std::move(compare)); }
+		bool to_be(T& compare) { return toBe(compare); }
 		template<typename C> bool to_be(C&& compare){ return toBe(std::move(compare)); }
 		bool to_be_close_to(T compare, T precision){ return toBeCloseTo(compare, precision); }
 		bool to_be_greater_than(T compare){ return toBeGreaterThan(compare); }
@@ -87,6 +91,24 @@ class QTestExpect
 		ErrorReport* error;
 		bool inv = false;
 };
+
+template<typename T>
+bool QTestExpect<T>::toBe(T&& compare)
+{
+	if (!(*result &= proceed_result(val == compare))) {
+		report_error(__func__, val, compare);
+	}
+	return *result;
+}
+
+template<typename T>
+bool QTestExpect<T>::toBe(T& compare)
+{
+	if (!(*result &= proceed_result(val == compare))) {
+		report_error(__func__, val, compare);
+	}
+	return *result;
+}
 
 template<typename T>
 template<typename C>

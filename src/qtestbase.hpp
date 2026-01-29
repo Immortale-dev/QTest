@@ -81,6 +81,7 @@ class QTestBase
 		QTestBase();
 		~QTestBase();
 
+		void script(function_cb_t fn);
 		void describe(std::string str, describe_function_cb_t fn, int param, std::string_view file);
 		void before(function_cb_t fn);
 		void before_each(function_cb_t fn);
@@ -94,8 +95,6 @@ class QTestBase
 		template<typename T> QTestExpect<T> expect(T&& a, std::string_view s);
 		template<typename T> QTestExpect<T> expect(T& a, std::string_view s);
 
-		bool current_test_good();
-
 	private:
 		Describe& current_describe();
 
@@ -106,6 +105,7 @@ class QTestBase
 		void current_describe_ran_inc();
 		bool current_describe_ran();
 
+		void run_scenarios();
 		void call_before_all(Describe& d);
 		void call_after_all(Describe& d);
 		void call_before_each(Describe& d);
@@ -124,6 +124,7 @@ class QTestBase
 		std::string generate_describes_text(std::vector<std::shared_ptr<Describe>>& descrs);
 		std::string generate_test_error(std::string_view expect_str, ErrorReport& error);
 
+		std::vector<function_cb_t> scenarios;
 		std::vector<std::shared_ptr<Describe>> describes;
 		std::vector<FailedTest> failed_tests;
 		std::shared_ptr<Test> current_test;
@@ -149,10 +150,16 @@ inline QTestBase::QTestBase()
 
 inline QTestBase::~QTestBase()
 {
+	run_scenarios();
 	show_statistics();
 	if(tests_failed) {
 		exit(1);
 	}
+}
+
+inline void QTestBase::script(std::function<void()> fn)
+{
+	scenarios.push_back(fn);
 }
 
 inline void QTestBase::describe(std::string str, describe_function_cb_t fn, int param, std::string_view file)
@@ -259,11 +266,6 @@ QTestExpect<T> QTestBase::expect(T& a, std::string_view s)
 	return QTestExpect<T>(a, &(current_test->result), &current_test->error);
 }
 
-inline bool QTestBase::current_test_good()
-{
-	return current_test->result;
-}
-
 inline std::string QTestBase::generate_describes_text(std::vector<std::shared_ptr<Describe>>& descrs)
 {
 	std::string res;
@@ -318,6 +320,13 @@ inline bool QTestBase::in_only_describe()
 inline QTestBase::Describe& QTestBase::current_describe()
 {
 	return *describes.back();
+}
+
+inline void QTestBase::run_scenarios()
+{
+	for (auto& fn : scenarios) {
+		fn();
+	}
 }
 
 inline void QTestBase::call_before_all(Describe& d)

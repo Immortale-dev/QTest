@@ -1,4 +1,4 @@
-/* v2.0.2 */
+/* v2.0.3 */
 #ifndef QTEST_H
 #define QTEST_H
 
@@ -52,8 +52,8 @@
 #define INFO_PRINT(a) Q_TEST_NS_DETAIL::BASE.info_print(a)
 #define TEST_FAILED(a) EXPECT(std::string{a}).fail();
 #define TEST_SUCCEED() EXPECT(1).toBe(1)
-#define SCENARIO_START Q_TEST__TEST_UNIT ([]{
-#define SCENARIO_END });
+#define SCENARIO_START Q_TEST__TEST_UNIT ([]{ Q_TEST_NS_DETAIL::BASE.script([]{
+#define SCENARIO_END }); });
 // END OF PUBLIC API
 
 namespace Q_TEST_NS_DETAIL {
@@ -81,6 +81,8 @@ class QTestExpect {
 	public:
 		QTestExpect(T&& a, bool* result, ErrorReport* error) : val(std::move(a)), result(result), error(error) {};
 		QTestExpect(T& a, bool* result, ErrorReport* error) : val(a), result(result), error(error) {};
+		bool toBe(T&& compare);
+		bool toBe(T& compare);
 		template<typename C> bool toBe(C&& compare);
 		bool toBeCloseTo(T compare, T precision);
 		bool toBeGreaterThan(T compare);
@@ -98,6 +100,8 @@ class QTestExpect {
 		QTestExpect<T> NOT();
 		bool fail();
 
+		bool to_be(T&& compare) { return toBe(std::move(compare)); }
+		bool to_be(T& compare) { return toBe(compare); }
 		template<typename C> bool to_be(C&& compare){ return toBe(std::move(compare)); }
 		bool to_be_close_to(T compare, T precision){ return toBeCloseTo(compare, precision); }
 		bool to_be_greater_than(T compare){ return toBeGreaterThan(compare); }
@@ -246,6 +250,7 @@ class QTestBase {
 	public:
 		QTestBase();
 		~QTestBase();
+		void script(function_cb_t fn);
 		void describe(std::string str, describe_function_cb_t fn, int param, std::string_view file);
 		void before(function_cb_t fn);
 		void before_each(function_cb_t fn);
@@ -256,7 +261,6 @@ class QTestBase {
 		std::basic_ostream<char>& info_print();
 		template<typename T> QTestExpect<T> expect(T&& a, std::string_view s);
 		template<typename T> QTestExpect<T> expect(T& a, std::string_view s);
-		bool current_test_good();
 
 	private:
 		Describe& current_describe();
@@ -266,6 +270,7 @@ class QTestBase {
 		bool in_only_describe();
 		void current_describe_ran_inc();
 		bool current_describe_ran();
+		void run_scenarios();
 		void call_before_all(Describe& d);
 		void call_after_all(Describe& d);
 		void call_before_each(Describe& d);
@@ -277,9 +282,10 @@ class QTestBase {
 		void show_test_infos(Test& t);
 		void show_failed_tests();
 		void show_succeed();
-
 		std::string generate_describes_text(std::vector<std::shared_ptr<Describe>>& descrs);
 		std::string generate_test_error(std::string_view expect_str, ErrorReport& error);
+
+		std::vector<function_cb_t> scenarios;
 		std::vector<std::shared_ptr<Describe>> describes;
 		std::vector<FailedTest> failed_tests;
 		std::shared_ptr<Test> current_test;
@@ -290,6 +296,24 @@ class QTestBase {
 		bool tests_only = false;
 		bool describes_changed = false;
 };
+
+template<typename T>
+bool QTestExpect<T>::toBe(T&& compare)
+{
+	if (!(*result &= proceed_result(val == compare))) {
+		report_error(__func__, val, compare);
+	}
+	return *result;
+}
+
+template<typename T>
+bool QTestExpect<T>::toBe(T& compare)
+{
+	if (!(*result &= proceed_result(val == compare))) {
+		report_error(__func__, val, compare);
+	}
+	return *result;
+}
 
 template<typename T>
 template<typename C>
@@ -805,8 +829,14 @@ inline QTestBase::QTestBase()
 
 inline QTestBase::~QTestBase()
 {
+	run_scenarios();
 	show_statistics();
 	if(tests_failed) exit(1);
+}
+
+inline void QTestBase::script(std::function<void()> fn)
+{
+	scenarios.push_back(fn);
 }
 
 inline void QTestBase::describe(std::string str, describe_function_cb_t fn, int param, std::string_view file)
@@ -898,11 +928,6 @@ QTestExpect<T> QTestBase::expect(T& a, std::string_view s)
 	return QTestExpect<T>(a, &(current_test->result), &current_test->error);
 }
 
-inline bool QTestBase::current_test_good()
-{
-	return current_test->result;
-}
-
 inline std::string QTestBase::generate_describes_text(std::vector<std::shared_ptr<Describe>>& descrs)
 {
 	std::string res;
@@ -953,6 +978,13 @@ inline bool QTestBase::in_only_describe()
 inline QTestBase::Describe& QTestBase::current_describe()
 {
 	return *describes.back();
+}
+
+inline void QTestBase::run_scenarios()
+{
+	for (auto& fn : scenarios) {
+		fn();
+	}
 }
 
 inline void QTestBase::call_before_all(Describe& d)

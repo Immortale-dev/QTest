@@ -1,11 +1,6 @@
 #ifndef QTEST_H
 #define QTEST_H
 
-// TODO:
-// update single header file
-// test all projects
-// update docs
-
 #include "qtestbase.hpp"
 #include "qtestutils.hpp"
 
@@ -23,8 +18,8 @@
 #define INFO_PRINT(a) Q_TEST_NS_DETAIL::BASE.info_print(a)
 #define TEST_FAILED(a) EXPECT(std::string{a}).fail();
 #define TEST_SUCCEED() EXPECT(1).toBe(1)
-#define SCENARIO_START Q_TEST__TEST_UNIT ([]{
-#define SCENARIO_END });
+#define SCENARIO_START Q_TEST__TEST_UNIT ([]{ Q_TEST_NS_DETAIL::BASE.script([]{
+#define SCENARIO_END }); });
 
 namespace Q_TEST_NS_DETAIL {
 	// Initialize file local helpers
